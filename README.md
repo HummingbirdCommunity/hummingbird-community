@@ -37,15 +37,16 @@ active once their keys are set in `.env.local`.
 
 ## Scripts
 
-| Command           | Description                      |
-| ----------------- | -------------------------------- |
-| `npm run dev`     | Start the dev server (Turbopack) |
-| `npm run build`   | Production build                 |
-| `npm run start`   | Serve the production build       |
-| `npm run lint`    | Run ESLint                       |
-| `npm run format`  | Format with Prettier             |
-| `npm run db:push` | Apply migrations to the DB       |
-| `npm run db:diff` | Diff local schema vs. migrations |
+| Command                   | Description                           |
+| ------------------------- | ------------------------------------- |
+| `npm run dev`             | Start the dev server (Turbopack)      |
+| `npm run build`           | Production build                      |
+| `npm run start`           | Serve the production build            |
+| `npm run lint`            | Run ESLint                            |
+| `npm run format`          | Format with Prettier                  |
+| `npm run db:push:staging` | Apply migrations to the staging DB    |
+| `npm run db:push:prod`    | Apply migrations to the production DB |
+| `npm run db:diff`         | Diff local schema vs. migrations      |
 
 ## Project structure
 
@@ -81,17 +82,33 @@ Email + password auth via `@supabase/supabase-js` (client-side session in
 > **Dev tip:** to skip the email-confirmation step during development, turn off
 > _Confirm email_ under Supabase → Authentication → Providers → Email.
 
-## Database & migrations
+## Environments
 
-Schema is managed with the Supabase CLI under `supabase/migrations/`.
+|                     | Git branch              | Vercel            | Supabase project                 |
+| ------------------- | ----------------------- | ----------------- | -------------------------------- |
+| **Production**      | `main`                  | Production deploy | `mggqxpaxtewwyiyqmsrw`           |
+| **Preview / local** | any feature branch / PR | Preview deploy    | `cywuejplvgajgtmevxrv` (staging) |
+
+Vercel creates a preview deployment automatically for every branch/PR. Set the
+staging Supabase values in Vercel's **Preview** scope and the production values
+in the **Production** scope (`NEXT_PUBLIC_*` values are inlined at build time).
+
+Typical flow:
 
 ```bash
-# Apply pending migrations to the remote database
-npx supabase db push --db-url "postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres"
-
-# Or, after `npx supabase login` + `npm run db:link`:
-npm run db:push
+git checkout -b feature/xyz
+# ...changes + any new supabase/migrations/*.sql
+npm run db:push:staging       # apply schema to staging first
+git push -u origin feature/xyz  # Vercel builds a preview URL (staging DB)
+# open a PR, test on the preview URL, then merge to main → production deploy
+npm run db:push:prod          # apply the same migration to production
 ```
+
+## Database & migrations
+
+Schema is managed with the Supabase CLI under `supabase/migrations/`. The
+`db:push:*` scripts read the target DB password from `.env.local`
+(`STAGING_DB_PASSWORD` / `PROD_DB_PASSWORD`) and apply pending migrations.
 
 The first migration (`init_profiles`) creates `public.profiles` with RLS
 (public read, self-write) and the signup trigger.

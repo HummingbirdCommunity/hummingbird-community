@@ -12,8 +12,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:link": "supabase link --project-ref mggqxpaxtewwyiyqmsrw",
-    "db:push": "supabase db push",
+    "db:push:staging": "bash scripts/db-push.sh staging",
+    "db:push:prod": "bash scripts/db-push.sh prod",
     "db:diff": "supabase db diff"
   },
   "dependencies": {
