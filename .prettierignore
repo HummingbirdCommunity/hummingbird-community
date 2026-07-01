@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+dist
+coverage
+.vercel
+.turbo
+*.lock
+package-lock.json
+public
+next-env.d.ts
