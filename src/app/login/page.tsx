@@ -58,7 +58,7 @@ export default function LoginPage(): ReactElement {
 	}
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+		<div className="flex min-h-screen items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
 			<div className="w-full max-w-md">
 				<div className="mb-8 text-center">
 					<div className="bg-brand-gradient mb-4 inline-flex items-center justify-center rounded-2xl p-4">

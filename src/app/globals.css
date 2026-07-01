@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @utility bg-brand-gradient {
-	@apply bg-gradient-to-r from-indigo-600 to-purple-600;
+	@apply bg-linear-to-r from-indigo-600 to-purple-600;
 }
 
 @theme inline {

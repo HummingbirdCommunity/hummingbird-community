@@ -1,0 +1,9 @@
+{
+	// Tailwind v4 configures itself via CSS at-rules (@theme, @utility, @custom-variant,
+	// @apply, @layer) that VS Code's built-in CSS validator doesn't know. Stop it from
+	// flagging them as "Unknown at rule". The Tailwind CSS IntelliSense extension provides
+	// the real validation/autocomplete for these files.
+	"css.lint.unknownAtRules": "ignore",
+	"scss.lint.unknownAtRules": "ignore",
+	"less.lint.unknownAtRules": "ignore"
+}
