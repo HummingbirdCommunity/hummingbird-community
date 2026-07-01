@@ -1,5 +1,8 @@
 import type { ReactElement } from 'react';
 import { Sparkles } from 'lucide-react';
+import Link from 'next/link';
+
+import { Button } from '@/components/ui/button';
 
 export default function HomePage(): ReactElement {
 	return (
@@ -12,15 +15,18 @@ export default function HomePage(): ReactElement {
 					<h1 className="bg-brand-gradient mb-2 bg-clip-text text-4xl font-bold text-transparent">
 						Hummingbird Community
 					</h1>
-					<p className="text-gray-600">A place to connect, share, and grow together.</p>
+					<p className="text-gray-600">A place for remote workers to connect, share, and grow together.</p>
 				</div>
 
 				<div className="mb-6 rounded-2xl bg-white p-8 text-center shadow-xl">
 					<h2 className="mb-2 text-2xl font-semibold text-gray-900">Coming soon</h2>
-					<p className="text-sm text-gray-500">
-						We&apos;re building something great. The infrastructure is up and running — features are on
-						the way.
+					<p className="mb-6 text-sm text-gray-500">
+						We&apos;re building something great. The infrastructure is up and running — features are on the
+						way.
 					</p>
+					<Button asChild className="w-full">
+						<Link href="/login">Sign in / Sign up</Link>
+					</Button>
 				</div>
 			</div>
 		</div>

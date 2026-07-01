@@ -11,9 +11,13 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:link": "supabase link --project-ref mggqxpaxtewwyiyqmsrw",
+    "db:push": "supabase db push",
+    "db:diff": "supabase db diff"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@supabase/supabase-js": "^2.107.0",
     "@tanstack/react-query": "^5.90.21",
@@ -38,6 +42,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "prettier": "3.8.4",
+    "supabase": "^2.107.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
