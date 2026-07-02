@@ -1,1 +1,14 @@
-{}
+{
+	"common": {
+		"appName": "Hummingbird Community",
+		"signInSignUp": "Sign in / Sign up"
+	},
+	"home": {
+		"tagline": "A place for remote workers to connect, share, and grow together.",
+		"comingSoon": "Coming soon",
+		"blurb": "We're building something great. The infrastructure is up and running — features are on the way."
+	},
+	"metadata": {
+		"description": "A community for people to connect, share, and grow together."
+	}
+}

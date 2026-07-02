@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { QueryProvider } from '@/components/QueryProvider';
@@ -9,20 +9,21 @@ import { routing } from '@/i18n/routing';
 
 import '../globals.css';
 
-export const metadata: Metadata = {
-	title: 'Hummingbird Community',
-	description: 'A community for people to connect, share, and grow together.',
-	openGraph: {
-		title: 'Hummingbird Community',
-		description: 'A community for people to connect, share, and grow together.',
-		type: 'website',
-	},
-	twitter: {
-		card: 'summary',
-		title: 'Hummingbird Community',
-		description: 'A community for people to connect, share, and grow together.',
-	},
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+	const { locale } = await params;
+	const t = await getTranslations({ locale, namespace: 'metadata' });
+	const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+	const title = tCommon('appName');
+	const description = t('description');
+
+	return {
+		title,
+		description,
+		openGraph: { title, description, type: 'website' },
+		twitter: { card: 'summary', title, description },
+	};
+}
 
 export function generateStaticParams() {
 	return routing.locales.map((locale) => ({ locale }));
