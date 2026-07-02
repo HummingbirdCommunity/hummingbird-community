@@ -72,9 +72,7 @@ export default function LoginPage(): ReactElement {
 						priority
 						className="mx-auto mb-4 h-24 w-24 object-contain"
 					/>
-					<h1 className="bg-brand-gradient bg-clip-text text-3xl font-bold text-transparent">
-						{tCommon('appName')}
-					</h1>
+					<h1 className="text-foreground text-3xl font-bold">{tCommon('appName')}</h1>
 				</div>
 
 				<Card>

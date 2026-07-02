@@ -26,9 +26,7 @@ export default function HomePage({ params }: { params: Promise<{ locale: string 
 						priority
 						className="mx-auto mb-4 h-28 w-28 object-contain"
 					/>
-					<h1 className="bg-brand-gradient mb-2 bg-clip-text text-4xl font-bold text-transparent">
-						{tCommon('appName')}
-					</h1>
+					<h1 className="text-foreground mb-2 text-4xl font-bold">{tCommon('appName')}</h1>
 					<p className="text-muted-foreground">{t('tagline')}</p>
 				</div>
 

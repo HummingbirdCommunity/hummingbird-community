@@ -3,9 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Brand gradient for the wordmark / clip-text headings. */
+/* Accent gradient for highlighted words / emphasis (teal spark, used sparingly). */
 @utility bg-brand-gradient {
-	@apply bg-linear-to-r from-brand-teal to-brand-deep-teal;
+	@apply bg-linear-to-r from-brand-teal to-brand-sky;
 }
 
 /* Shared page canvas: subtle brand tint used by full-screen pages. */
@@ -44,11 +44,12 @@
 
 	/* Brand primitives exposed as utilities: bg-brand-teal, text-ink, bg-canvas, … */
 	--color-brand-teal: var(--teal);
-	--color-brand-deep-teal: var(--deep-teal);
 	--color-brand-sky: var(--sky-teal);
 	--color-brand-mint: var(--mint);
 	--color-brand-lime: var(--lime);
+	--color-link: var(--teal-link);
 	--color-ink: var(--ink-navy);
+	--color-deep-ink: var(--deep-ink);
 	--color-canvas: var(--canvas);
 	--color-surface: var(--surface);
 	--color-hairline: var(--hairline);
@@ -64,13 +65,16 @@
  * every semantic token below references these, so components follow automatically.
  */
 :root {
-	--teal: #12a08d; /* Brand identity: large text, icons, gradient, focus ring */
-	--teal-action: #0c8272; /* Interactive fill (buttons); white text passes AA (4.72:1) */
-	--deep-teal: #0a5b54; /* Headers, dark surfaces */
-	--sky-teal: #2fb7a4; /* Hover / highlight */
-	--mint: #8fd9bc; /* Tints, soft fills */
-	--lime: #a8db6e; /* CTA pop — Ink text only, never white */
-	--ink-navy: #14283a; /* Body text & deepest shade */
+	/* Structural — the premium base */
+	--ink-navy: #14283a; /* Primary: dark surfaces & body text */
+	--deep-ink: #0d1b29; /* Deepest shade / depth */
+
+	/* Accents — used sparingly (links, hover, highlights) */
+	--teal: #12a08d; /* Accent: large text, highlights, focus ring */
+	--teal-link: #0c8272; /* Accessible teal for small link/accent text (4.72:1) */
+	--sky-teal: #2fb7a4; /* Accent hover / highlight */
+	--mint: #8fd9bc; /* Tint: soft fills on light */
+	--lime: #a8db6e; /* Spark: rare CTA pop only — Ink text, never white */
 
 	--canvas: #f7faf8; /* App background */
 	--surface: #ffffff; /* Cards, sheets */
@@ -92,14 +96,14 @@
 	--card-foreground: var(--ink-navy);
 	--popover: var(--surface);
 	--popover-foreground: var(--ink-navy);
-	--primary: var(--teal-action);
+	--primary: var(--ink-navy);
 	--primary-foreground: var(--surface);
 	--secondary: var(--mint-soft);
-	--secondary-foreground: var(--deep-teal);
+	--secondary-foreground: var(--ink-navy);
 	--muted: var(--muted-surface);
 	--muted-foreground: var(--muted-strong);
 	--accent: var(--mint-soft);
-	--accent-foreground: var(--deep-teal);
+	--accent-foreground: var(--teal-link);
 	--destructive: var(--danger);
 	--border: var(--hairline);
 	--input: var(--hairline);
