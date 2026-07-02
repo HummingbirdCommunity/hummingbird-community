@@ -22,7 +22,7 @@ export function LanguageSwitcher(): ReactElement {
 		<div
 			role="group"
 			aria-label={t('switchLanguage')}
-			className="inline-flex items-center gap-1 rounded-full border bg-white/80 p-1 shadow-sm backdrop-blur"
+			className="bg-card/80 inline-flex items-center gap-1 rounded-full border p-1 shadow-sm backdrop-blur"
 		>
 			{routing.locales.map((loc) => (
 				<button
@@ -32,7 +32,9 @@ export function LanguageSwitcher(): ReactElement {
 					onClick={() => router.replace(pathname, { locale: loc })}
 					className={cn(
 						'rounded-full px-3 py-1 text-sm font-medium transition-colors',
-						loc === locale ? 'bg-brand-gradient text-white' : 'text-gray-600 hover:text-gray-900'
+						loc === locale
+							? 'bg-primary text-primary-foreground'
+							: 'text-muted-foreground hover:text-foreground'
 					)}
 				>
 					{localeLabels[loc]}

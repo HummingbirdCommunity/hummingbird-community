@@ -3,8 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Accent gradient for highlighted words / emphasis (teal spark, used sparingly). */
 @utility bg-brand-gradient {
-	@apply bg-linear-to-r from-indigo-600 to-purple-600;
+	@apply bg-linear-to-r from-brand-teal to-brand-sky;
+}
+
+/* Shared page canvas: subtle brand tint used by full-screen pages. */
+@utility bg-app-canvas {
+	@apply bg-linear-to-br from-canvas via-canvas to-brand-mint/25;
+}
+
+/* CTA pop: Lime must always pair with Ink text (never white). */
+@utility bg-brand-cta {
+	@apply bg-brand-lime text-ink;
 }
 
 @theme inline {
@@ -30,53 +41,98 @@
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
+
+	/* Brand primitives exposed as utilities: bg-brand-teal, text-ink, bg-canvas, … */
+	--color-brand-teal: var(--teal);
+	--color-brand-sky: var(--sky-teal);
+	--color-brand-mint: var(--mint);
+	--color-brand-lime: var(--lime);
+	--color-link: var(--teal-link);
+	--color-ink: var(--ink-navy);
+	--color-deep-ink: var(--deep-ink);
+	--color-canvas: var(--canvas);
+	--color-surface: var(--surface);
+	--color-hairline: var(--hairline);
+
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
 }
 
+/*
+ * Tier 1 — Brand primitives (hex). This is the single place to edit for a re-skin;
+ * every semantic token below references these, so components follow automatically.
+ */
 :root {
+	/* Structural — the premium base */
+	--ink-navy: #14283a; /* Primary: dark surfaces & body text */
+	--deep-ink: #0d1b29; /* Deepest shade / depth */
+
+	/* Accents — used sparingly (links, hover, highlights) */
+	--teal: #12a08d; /* Accent: large text, highlights, focus ring */
+	--teal-link: #0c8272; /* Accessible teal for small link/accent text (4.72:1) */
+	--sky-teal: #2fb7a4; /* Accent hover / highlight */
+	--mint: #8fd9bc; /* Tint: soft fills on light */
+	--lime: #a8db6e; /* Spark: rare CTA pop only — Ink text, never white */
+
+	--canvas: #f7faf8; /* App background */
+	--surface: #ffffff; /* Cards, sheets */
+	--hairline: #e1eae5; /* Borders, inputs */
+	--muted-grey: #6c7c77; /* Muted UI (source) */
+	--muted-strong: #5e6e68; /* Muted text — darkened to pass AA on small text */
+	--mint-soft: #eaf6ef; /* Subtle accent / secondary background */
+	--muted-surface: #eef3f1; /* Muted surface fill */
+	--danger: #e5484d; /* Error / destructive (palette has none) */
+
 	--radius: 0.625rem;
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.129 0.042 264.695);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.129 0.042 264.695);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.129 0.042 264.695);
-	--primary: oklch(0.208 0.042 265.755);
-	--primary-foreground: oklch(0.984 0.003 247.858);
-	--secondary: oklch(0.968 0.007 247.896);
-	--secondary-foreground: oklch(0.208 0.042 265.755);
-	--muted: oklch(0.968 0.007 247.896);
-	--muted-foreground: oklch(0.554 0.046 257.417);
-	--accent: oklch(0.968 0.007 247.896);
-	--accent-foreground: oklch(0.208 0.042 265.755);
-	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.929 0.013 255.508);
-	--input: oklch(0.929 0.013 255.508);
-	--ring: oklch(0.704 0.04 256.788);
+
+	/*
+	 * Tier 2 — Semantic tokens (shadcn). Reference Tier 1 only; never hardcode hex here.
+	 */
+	--background: var(--canvas);
+	--foreground: var(--ink-navy);
+	--card: var(--surface);
+	--card-foreground: var(--ink-navy);
+	--popover: var(--surface);
+	--popover-foreground: var(--ink-navy);
+	--primary: var(--ink-navy);
+	--primary-foreground: var(--surface);
+	--secondary: var(--mint-soft);
+	--secondary-foreground: var(--ink-navy);
+	--muted: var(--muted-surface);
+	--muted-foreground: var(--muted-strong);
+	--accent: var(--mint-soft);
+	--accent-foreground: var(--teal-link);
+	--destructive: var(--danger);
+	--border: var(--hairline);
+	--input: var(--hairline);
+	--ring: var(--teal);
 }
 
+/*
+ * Dark mode deferred (HB) — provisional placeholder, not yet designed.
+ * Kept functional so toggling `.dark` doesn't break; real dark tokens come later.
+ */
 .dark {
-	--background: oklch(0.129 0.042 264.695);
-	--foreground: oklch(0.984 0.003 247.858);
-	--card: oklch(0.208 0.042 265.755);
-	--card-foreground: oklch(0.984 0.003 247.858);
-	--popover: oklch(0.208 0.042 265.755);
-	--popover-foreground: oklch(0.984 0.003 247.858);
-	--primary: oklch(0.929 0.013 255.508);
-	--primary-foreground: oklch(0.208 0.042 265.755);
-	--secondary: oklch(0.279 0.041 260.031);
-	--secondary-foreground: oklch(0.984 0.003 247.858);
-	--muted: oklch(0.279 0.041 260.031);
-	--muted-foreground: oklch(0.704 0.04 256.788);
-	--accent: oklch(0.279 0.041 260.031);
-	--accent-foreground: oklch(0.984 0.003 247.858);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.551 0.027 264.364);
+	--background: var(--ink-navy);
+	--foreground: var(--canvas);
+	--card: #17324a;
+	--card-foreground: var(--canvas);
+	--popover: #17324a;
+	--popover-foreground: var(--canvas);
+	--primary: var(--sky-teal);
+	--primary-foreground: var(--ink-navy);
+	--secondary: #17324a;
+	--secondary-foreground: var(--canvas);
+	--muted: #17324a;
+	--muted-foreground: #9fb0ab;
+	--accent: #17324a;
+	--accent-foreground: var(--canvas);
+	--destructive: var(--danger);
+	--border: rgb(255 255 255 / 10%);
+	--input: rgb(255 255 255 / 15%);
+	--ring: var(--sky-teal);
 }
 
 @layer base {

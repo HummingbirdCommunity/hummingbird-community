@@ -1,8 +1,8 @@
 'use client';
 
 import type { FormEvent, ReactElement } from 'react';
-import { Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -61,15 +61,18 @@ export default function LoginPage(): ReactElement {
 	}
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+		<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
 			<div className="w-full max-w-md">
 				<div className="mb-8 text-center">
-					<div className="bg-brand-gradient mb-4 inline-flex items-center justify-center rounded-2xl p-4">
-						<Sparkles className="h-8 w-8 text-white" />
-					</div>
-					<h1 className="bg-brand-gradient bg-clip-text text-3xl font-bold text-transparent">
-						{tCommon('appName')}
-					</h1>
+					<Image
+						src="/logo.png"
+						alt={tCommon('appName')}
+						width={96}
+						height={96}
+						priority
+						className="mx-auto mb-4 h-24 w-24 object-contain"
+					/>
+					<h1 className="text-foreground text-3xl font-bold">{tCommon('appName')}</h1>
 				</div>
 
 				<Card>
