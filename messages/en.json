@@ -1,12 +1,38 @@
 {
 	"common": {
 		"appName": "Hummingbird Community",
-		"signInSignUp": "Sign in / Sign up"
+		"signInSignUp": "Sign in / Sign up",
+		"email": "Email",
+		"loading": "Loading…"
 	},
 	"home": {
 		"tagline": "A place for remote workers to connect, share, and grow together.",
 		"comingSoon": "Coming soon",
 		"blurb": "We're building something great. The infrastructure is up and running — features are on the way."
+	},
+	"login": {
+		"welcomeBack": "Welcome back",
+		"createAccount": "Create your account",
+		"signinSubtitle": "Sign in to continue to the community.",
+		"signupSubtitle": "Join the remote work community.",
+		"password": "Password",
+		"pleaseWait": "Please wait…",
+		"signIn": "Sign in",
+		"signUp": "Sign up",
+		"noAccount": "Don't have an account?",
+		"haveAccount": "Already have an account?",
+		"accountCreated": "Account created — welcome!",
+		"checkEmail": "Check your email to confirm your account.",
+		"signedIn": "Signed in.",
+		"genericError": "Something went wrong."
+	},
+	"dashboard": {
+		"welcome": "Welcome 👋",
+		"welcomeNamed": "Welcome, {name} 👋",
+		"signedInDescription": "You're signed in to {appName}.",
+		"userId": "User ID",
+		"signOut": "Sign out",
+		"signedOut": "Signed out."
 	},
 	"metadata": {
 		"description": "A community for people to connect, share, and grow together."
