@@ -35,3 +35,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local scratch docs (per-feature working plans, drafts)
+/docs/*.local.md
+/docs/spec/
