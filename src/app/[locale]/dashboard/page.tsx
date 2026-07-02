@@ -56,7 +56,7 @@ export default function DashboardPage(): ReactElement | null {
 	}
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+		<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
 			<div className="w-full max-w-lg">
 				<Card>
 					<CardHeader>
