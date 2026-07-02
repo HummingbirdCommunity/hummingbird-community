@@ -2,17 +2,20 @@
 
 import type { ReactElement } from 'react';
 import { LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 export default function DashboardPage(): ReactElement | null {
 	const router = useRouter();
+	const t = useTranslations('dashboard');
+	const tCommon = useTranslations('common');
 	const { isLoggedIn, user, userEmail, loading } = useAuth();
 	const [displayName, setDisplayName] = useState<string | null>(null);
 
@@ -40,12 +43,16 @@ export default function DashboardPage(): ReactElement | null {
 			toast.error(error.message);
 			return;
 		}
-		toast.success('Signed out.');
+		toast.success(t('signedOut'));
 		router.replace('/login');
 	}
 
 	if (loading || !isLoggedIn) {
-		return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading…</div>;
+		return (
+			<div className="flex min-h-screen items-center justify-center text-muted-foreground">
+				{tCommon('loading')}
+			</div>
+		);
 	}
 
 	return (
@@ -53,23 +60,25 @@ export default function DashboardPage(): ReactElement | null {
 			<div className="w-full max-w-lg">
 				<Card>
 					<CardHeader>
-						<CardTitle className="text-2xl">Welcome{displayName ? `, ${displayName}` : ''} 👋</CardTitle>
-						<CardDescription>You&apos;re signed in to Hummingbird Community.</CardDescription>
+						<CardTitle className="text-2xl">
+							{displayName ? t('welcomeNamed', { name: displayName }) : t('welcome')}
+						</CardTitle>
+						<CardDescription>{t('signedInDescription', { appName: tCommon('appName') })}</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4">
 						<dl className="text-sm">
 							<div className="flex justify-between border-b py-2">
-								<dt className="text-muted-foreground">Email</dt>
+								<dt className="text-muted-foreground">{tCommon('email')}</dt>
 								<dd className="font-medium">{userEmail}</dd>
 							</div>
 							<div className="flex justify-between py-2">
-								<dt className="text-muted-foreground">User ID</dt>
+								<dt className="text-muted-foreground">{t('userId')}</dt>
 								<dd className="font-mono text-xs">{user?.id}</dd>
 							</div>
 						</dl>
 						<Button variant="outline" className="w-full" onClick={handleSignOut}>
 							<LogOut className="h-4 w-4" />
-							Sign out
+							{t('signOut')}
 						</Button>
 					</CardContent>
 				</Card>

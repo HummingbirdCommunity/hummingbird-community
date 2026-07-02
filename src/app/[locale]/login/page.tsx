@@ -2,7 +2,7 @@
 
 import type { FormEvent, ReactElement } from 'react';
 import { Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -11,12 +11,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 type Mode = 'signin' | 'signup';
 
 export default function LoginPage(): ReactElement {
 	const router = useRouter();
+	const t = useTranslations('login');
+	const tCommon = useTranslations('common');
 	const { isLoggedIn, loading: authLoading } = useAuth();
 	const [mode, setMode] = useState<Mode>('signin');
 	const [email, setEmail] = useState('');
@@ -39,19 +42,19 @@ export default function LoginPage(): ReactElement {
 				if (error) throw error;
 				// When email confirmation is enabled, no session is returned until the user confirms.
 				if (data.session) {
-					toast.success('Account created — welcome!');
+					toast.success(t('accountCreated'));
 					router.replace('/dashboard');
 				} else {
-					toast.success('Check your email to confirm your account.');
+					toast.success(t('checkEmail'));
 				}
 			} else {
 				const { error } = await supabase.auth.signInWithPassword({ email, password });
 				if (error) throw error;
-				toast.success('Signed in.');
+				toast.success(t('signedIn'));
 				router.replace('/dashboard');
 			}
 		} catch (err) {
-			toast.error(err instanceof Error ? err.message : 'Something went wrong.');
+			toast.error(err instanceof Error ? err.message : t('genericError'));
 		} finally {
 			setSubmitting(false);
 		}
@@ -65,25 +68,23 @@ export default function LoginPage(): ReactElement {
 						<Sparkles className="h-8 w-8 text-white" />
 					</div>
 					<h1 className="bg-brand-gradient bg-clip-text text-3xl font-bold text-transparent">
-						Hummingbird Community
+						{tCommon('appName')}
 					</h1>
 				</div>
 
 				<Card>
 					<CardHeader>
 						<CardTitle className="text-xl">
-							{mode === 'signin' ? 'Welcome back' : 'Create your account'}
+							{mode === 'signin' ? t('welcomeBack') : t('createAccount')}
 						</CardTitle>
 						<CardDescription>
-							{mode === 'signin'
-								? 'Sign in to continue to the community.'
-								: 'Join the remote work community.'}
+							{mode === 'signin' ? t('signinSubtitle') : t('signupSubtitle')}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleSubmit} className="space-y-4">
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="email">{tCommon('email')}</Label>
 								<Input
 									id="email"
 									type="email"
@@ -95,7 +96,7 @@ export default function LoginPage(): ReactElement {
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
+								<Label htmlFor="password">{t('password')}</Label>
 								<Input
 									id="password"
 									type="password"
@@ -108,18 +109,18 @@ export default function LoginPage(): ReactElement {
 								/>
 							</div>
 							<Button type="submit" className="w-full" disabled={submitting}>
-								{submitting ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Sign up'}
+								{submitting ? t('pleaseWait') : mode === 'signin' ? t('signIn') : t('signUp')}
 							</Button>
 						</form>
 
 						<p className="text-muted-foreground mt-4 text-center text-sm">
-							{mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+							{mode === 'signin' ? t('noAccount') : t('haveAccount')}{' '}
 							<button
 								type="button"
 								className="text-primary font-medium hover:underline"
 								onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
 							>
-								{mode === 'signin' ? 'Sign up' : 'Sign in'}
+								{mode === 'signin' ? t('signUp') : t('signIn')}
 							</button>
 						</p>
 					</CardContent>
