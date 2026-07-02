@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { QueryProvider } from '@/components/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { routing } from '@/i18n/routing';
@@ -46,6 +47,9 @@ export default async function LocaleLayout({
 		<html lang={locale}>
 			<body className="antialiased">
 				<NextIntlClientProvider>
+					<div className="fixed top-4 right-4 z-50">
+						<LanguageSwitcher />
+					</div>
 					<QueryProvider>{children}</QueryProvider>
 					<Toaster />
 				</NextIntlClientProvider>

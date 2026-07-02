@@ -3,7 +3,8 @@
 		"appName": "Hummingbird Community",
 		"signInSignUp": "Sign in / Sign up",
 		"email": "Email",
-		"loading": "Loading…"
+		"loading": "Loading…",
+		"switchLanguage": "Switch language"
 	},
 	"home": {
 		"tagline": "A place for remote workers to connect, share, and grow together.",

@@ -3,7 +3,8 @@
 		"appName": "蜂鸟社区",
 		"signInSignUp": "登录 / 注册",
 		"email": "电子邮箱",
-		"loading": "加载中…"
+		"loading": "加载中…",
+		"switchLanguage": "切换语言"
 	},
 	"home": {
 		"tagline": "一个让远程工作者连接、分享、共同成长的地方。",
