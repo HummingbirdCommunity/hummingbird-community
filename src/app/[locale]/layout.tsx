@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 import { QueryProvider } from '@/components/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
+import { routing } from '@/i18n/routing';
 
-import './globals.css';
+import '../globals.css';
 
 export const metadata: Metadata = {
 	title: 'Hummingbird Community',
@@ -20,16 +24,30 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
+export function generateStaticParams() {
+	return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({
 	children,
+	params,
 }: Readonly<{
 	children: React.ReactNode;
+	params: Promise<{ locale: string }>;
 }>) {
+	const { locale } = await params;
+	if (!hasLocale(routing.locales, locale)) {
+		notFound();
+	}
+	setRequestLocale(locale);
+
 	return (
-		<html lang="en">
+		<html lang={locale}>
 			<body className="antialiased">
-				<QueryProvider>{children}</QueryProvider>
-				<Toaster />
+				<NextIntlClientProvider>
+					<QueryProvider>{children}</QueryProvider>
+					<Toaster />
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);
