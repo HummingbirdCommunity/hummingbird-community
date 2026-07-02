@@ -35,6 +35,30 @@
 		"signOut": "退出登录",
 		"signedOut": "已退出登录。"
 	},
+	"panel": {
+		"title": "你想做点什么？",
+		"subtitle": "选择一项开始。",
+		"resume": {
+			"title": "上传你的简历",
+			"description": "获取一次简历扫描。",
+			"cta": "上传简历",
+			"success": "已收到你的简历，我们会尽快为你准备扫描结果。"
+		},
+		"jd": {
+			"title": "分享一个工作机会",
+			"description": "提交一份职位描述，通过审核可获得社区信任值。",
+			"cta": "上传职位描述",
+			"success": "已收到职位描述，我们会尽快审核。"
+		},
+		"fileHint": "仅支持 PDF，最大 5MB。",
+		"choosePdf": "选择 PDF 文件",
+		"submit": "提交",
+		"cancel": "取消",
+		"uploading": "上传中…",
+		"errorTooLarge": "文件超过 5MB 上限。",
+		"errorNotPdf": "请选择 PDF 文件。",
+		"errorGeneric": "上传失败，请重试。"
+	},
 	"metadata": {
 		"description": "一个让大家连接、分享、共同成长的社区。"
 	}
