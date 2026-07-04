@@ -59,6 +59,18 @@
 		"errorNotPdf": "请选择 PDF 文件。",
 		"errorGeneric": "上传失败，请重试。"
 	},
+	"github": {
+		"title": "GitHub",
+		"subtitle": "连接你的 GitHub 账号即可开始。",
+		"connect": "连接 GitHub",
+		"connecting": "连接中…",
+		"connectedAs": "已连接：{username}",
+		"disconnect": "断开连接",
+		"disconnecting": "断开中…",
+		"connectedToast": "已连接 GitHub 账号。",
+		"disconnectedToast": "已断开 GitHub 账号。",
+		"errorToast": "连接 GitHub 账号失败，请重试。"
+	},
 	"metadata": {
 		"description": "一个让大家连接、分享、共同成长的社区。"
 	}
