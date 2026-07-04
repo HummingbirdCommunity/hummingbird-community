@@ -35,6 +35,30 @@
 		"signOut": "Sign out",
 		"signedOut": "Signed out."
 	},
+	"panel": {
+		"title": "What would you like to do?",
+		"subtitle": "Pick one to get started.",
+		"resume": {
+			"title": "Upload your resume",
+			"description": "Get a resume scan.",
+			"cta": "Upload resume",
+			"success": "Resume received. We'll get your scan ready."
+		},
+		"jd": {
+			"title": "Share a job opportunity",
+			"description": "Submit a job description. Approved posts earn community trust.",
+			"cta": "Upload job description",
+			"success": "Job description received. We'll review it shortly."
+		},
+		"fileHint": "PDF only, up to 5MB.",
+		"choosePdf": "Choose a PDF",
+		"submit": "Submit",
+		"cancel": "Cancel",
+		"uploading": "Uploading…",
+		"errorTooLarge": "That file is over the 5MB limit.",
+		"errorNotPdf": "Please choose a PDF file.",
+		"errorGeneric": "Upload failed. Please try again."
+	},
 	"metadata": {
 		"description": "A community for people to connect, share, and grow together."
 	}
