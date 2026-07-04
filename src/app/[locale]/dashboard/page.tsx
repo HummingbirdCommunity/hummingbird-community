@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { GitHubConnectionCard } from '@/components/GitHubConnectionCard';
 import { SubmissionPanel } from '@/components/SubmissionPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,6 +61,7 @@ export default function DashboardPage(): ReactElement | null {
 		<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
 			<div className="w-full max-w-lg space-y-6">
 				<SubmissionPanel />
+				<GitHubConnectionCard />
 				<Card>
 					<CardHeader>
 						<CardTitle className="text-2xl">

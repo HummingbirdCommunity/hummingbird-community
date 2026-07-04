@@ -59,6 +59,19 @@
 		"errorNotPdf": "Please choose a PDF file.",
 		"errorGeneric": "Upload failed. Please try again."
 	},
+	"github": {
+		"title": "GitHub",
+		"subtitle": "Connect your GitHub account to get started.",
+		"connect": "Connect GitHub",
+		"connecting": "Connecting…",
+		"connectedAs": "Connected as {username}",
+		"disconnect": "Disconnect",
+		"disconnecting": "Disconnecting…",
+		"connectedToast": "GitHub account connected.",
+		"disconnectedToast": "GitHub account disconnected.",
+		"errorToast": "Couldn't connect your GitHub account. Please try again.",
+		"alreadyLinkedToast": "That GitHub account is already linked to another Hummingbird account."
+	},
 	"metadata": {
 		"description": "A community for people to connect, share, and grow together."
 	}
