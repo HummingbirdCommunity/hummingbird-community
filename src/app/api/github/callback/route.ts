@@ -23,7 +23,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 	const returnedState = url.searchParams.get('state');
 	const cookieState = decodeState(request.cookies.get(STATE_COOKIE)?.value);
 
-	function redirect(status: 'connected' | 'error'): NextResponse {
+	function redirect(status: 'connected' | 'error' | 'already-linked'): NextResponse {
 		// Return the user to the dashboard in the language they left from. The
 		// callback path carries no locale, so read next-intl's own NEXT_LOCALE
 		// cookie; `as-needed` routing means the default locale takes no prefix.
@@ -66,7 +66,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 			},
 			{ onConflict: 'user_id' }
 		);
-		if (error) throw error;
+		if (error) {
+			// 23505 on github_user_id: this GitHub account is already linked to a
+			// different user (the unique constraint doing its anti-gaming job).
+			if (error.code === '23505') return redirect('already-linked');
+			throw error;
+		}
 
 		return redirect('connected');
 	} catch (err) {

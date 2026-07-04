@@ -69,7 +69,8 @@
 		"disconnecting": "断开中…",
 		"connectedToast": "已连接 GitHub 账号。",
 		"disconnectedToast": "已断开 GitHub 账号。",
-		"errorToast": "连接 GitHub 账号失败，请重试。"
+		"errorToast": "连接 GitHub 账号失败，请重试。",
+		"alreadyLinkedToast": "该 GitHub 账号已绑定到另一个账户。"
 	},
 	"metadata": {
 		"description": "一个让大家连接、分享、共同成长的社区。"
