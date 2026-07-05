@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { disconnect, getStatus, startConnect } from '@/lib/github/client';
 
 const STATUS_KEY = ['github-status'];
+const LANGUAGES_KEY = ['github-languages'];
 
 export function GitHubConnectionCard(): ReactElement {
 	const t = useTranslations('github');
@@ -29,6 +30,8 @@ export function GitHubConnectionCard(): ReactElement {
 		mutationFn: disconnect,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: STATUS_KEY });
+			// Refetch the language card so it flips to its paused (disconnected) state.
+			queryClient.invalidateQueries({ queryKey: LANGUAGES_KEY });
 			toast.success(t('disconnectedToast'));
 		},
 		onError: () => toast.error(t('errorToast')),
@@ -44,6 +47,7 @@ export function GitHubConnectionCard(): ReactElement {
 		if (status === 'connected') {
 			toast.success(t('connectedToast'));
 			queryClient.invalidateQueries({ queryKey: STATUS_KEY });
+			queryClient.invalidateQueries({ queryKey: LANGUAGES_KEY });
 		} else if (status === 'already-linked') {
 			toast.error(t('alreadyLinkedToast'));
 		} else if (status === 'error') {

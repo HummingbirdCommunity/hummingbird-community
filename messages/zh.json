@@ -70,7 +70,21 @@
 		"connectedToast": "已连接 GitHub 账号。",
 		"disconnectedToast": "已断开 GitHub 账号。",
 		"errorToast": "连接 GitHub 账号失败，请重试。",
-		"alreadyLinkedToast": "该 GitHub 账号已绑定到另一个账户。"
+		"alreadyLinkedToast": "该 GitHub 账号已绑定到另一个账户。",
+		"languages": {
+			"title": "语言分布",
+			"subtitle": "基于你的公开仓库",
+			"empty": "还没有可统计语言的公开仓库。",
+			"error": "无法加载语言分布，请稍后重试。",
+			"rateLimited": "GitHub 接口暂时受限，请稍后再试。",
+			"stale": "当前显示的是上次保存的数据——最新一次刷新未成功。",
+			"needsReauth": "重新连接 GitHub 以授权读取你的公开仓库。",
+			"reconnect": "重新连接 GitHub",
+			"other": "其他",
+			"repoCount": "共 {count} 个仓库",
+			"lastUpdated": "更新于 {date}",
+			"paused": "已暂停更新——GitHub 已断开"
+		}
 	},
 	"metadata": {
 		"description": "一个让大家连接、分享、共同成长的社区。"
