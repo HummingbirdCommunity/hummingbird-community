@@ -5,9 +5,20 @@ const AUTHORIZE_URL = 'https://github.com/login/oauth/authorize';
 const TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const USER_URL = 'https://api.github.com/user';
 
-// Minimal identity scope: read the user's public profile. Broader scopes are
-// requested later, per-ticket, only when a feature actually needs them.
-const SCOPE = 'read:user';
+// read:user for identity; public_repo to read the user's public repositories
+// for the language distribution (HB-7). public_repo is write-capable but is the
+// classic OAuth scope GitHub exposes for public-repo access.
+export const REQUIRED_SCOPES = ['read:user', 'public_repo'] as const;
+const SCOPE = REQUIRED_SCOPES.join(' ');
+
+// True when a stored grant covers every required scope. GitHub returns granted
+// scopes comma-separated in the token response but space-separated on the
+// authorize request, so accept either separator. Used to spot connections made
+// under an older, narrower grant that need re-authorizing.
+export function hasRequiredScopes(granted: string | null): boolean {
+	const set = new Set((granted ?? '').split(/[\s,]+/).filter(Boolean));
+	return REQUIRED_SCOPES.every((scope) => set.has(scope));
+}
 
 const USER_AGENT = 'hummingbird-community';
 
