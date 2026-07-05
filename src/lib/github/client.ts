@@ -37,3 +37,23 @@ export async function disconnect(): Promise<void> {
 	const response = await fetch('/api/github/disconnect', { method: 'POST', headers: await authHeaders() });
 	if (!response.ok) throw new Error('Failed to disconnect GitHub');
 }
+
+export type LanguagesResponse =
+	| {
+			status: 'ok';
+			languages: Record<string, number>;
+			repoCount: number;
+			computedAt: string;
+			stale: boolean;
+			disconnected: boolean;
+	  }
+	| { status: 'needs-reauth' }
+	| { status: 'rate-limited' }
+	| { status: 'error' }
+	| { status: 'no-data' };
+
+export async function getLanguages(): Promise<LanguagesResponse> {
+	const response = await fetch('/api/github/languages', { headers: await authHeaders() });
+	if (!response.ok) throw new Error('Failed to load language distribution');
+	return response.json();
+}

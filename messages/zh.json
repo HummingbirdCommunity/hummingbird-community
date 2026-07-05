@@ -81,7 +81,9 @@
 			"needsReauth": "重新连接 GitHub 以授权读取你的公开仓库。",
 			"reconnect": "重新连接 GitHub",
 			"other": "其他",
-			"repoCount": "共 {count} 个仓库"
+			"repoCount": "共 {count} 个仓库",
+			"lastUpdated": "更新于 {date}",
+			"paused": "已暂停更新——GitHub 已断开"
 		}
 	},
 	"metadata": {

@@ -81,7 +81,9 @@
 			"needsReauth": "Reconnect GitHub to grant access to your public repositories.",
 			"reconnect": "Reconnect GitHub",
 			"other": "Other",
-			"repoCount": "Across {count, plural, one {# repository} other {# repositories}}"
+			"repoCount": "Across {count, plural, one {# repository} other {# repositories}}",
+			"lastUpdated": "Updated {date}",
+			"paused": "Updates paused — GitHub disconnected"
 		}
 	},
 	"metadata": {
