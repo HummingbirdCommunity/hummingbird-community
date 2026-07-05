@@ -70,7 +70,19 @@
 		"connectedToast": "GitHub account connected.",
 		"disconnectedToast": "GitHub account disconnected.",
 		"errorToast": "Couldn't connect your GitHub account. Please try again.",
-		"alreadyLinkedToast": "That GitHub account is already linked to another Hummingbird account."
+		"alreadyLinkedToast": "That GitHub account is already linked to another Hummingbird account.",
+		"languages": {
+			"title": "Language distribution",
+			"subtitle": "Across your public repositories",
+			"empty": "No public repositories with language data yet.",
+			"error": "Couldn't load your language distribution. Please try again later.",
+			"rateLimited": "GitHub is rate-limiting us right now. Please try again in a bit.",
+			"stale": "Showing the last saved data — the latest refresh didn't go through.",
+			"needsReauth": "Reconnect GitHub to grant access to your public repositories.",
+			"reconnect": "Reconnect GitHub",
+			"other": "Other",
+			"repoCount": "Across {count, plural, one {# repository} other {# repositories}}"
+		}
 	},
 	"metadata": {
 		"description": "A community for people to connect, share, and grow together."
