@@ -19,7 +19,7 @@ export default function HomePage({ params }: { params: Promise<{ locale: string 
 			<div className="w-full max-w-lg">
 				<div className="mb-8 text-center">
 					<Image
-						src="/logo.png"
+						src="/hb-logo.png"
 						alt={tCommon('appName')}
 						width={112}
 						height={112}
