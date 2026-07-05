@@ -23,7 +23,7 @@
 		"noAccount": "Don't have an account?",
 		"haveAccount": "Already have an account?",
 		"accountCreated": "Account created — welcome!",
-		"checkEmail": "Check your email to confirm your account.",
+		"checkEmail": "If this is a new email, check your inbox to confirm your account. Already registered? Just sign in.",
 		"signedIn": "Signed in.",
 		"genericError": "Something went wrong."
 	},

@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { getPublicBaseUrl } from '@/lib/utils';
 
 type Mode = 'signin' | 'signup';
 
@@ -38,7 +39,13 @@ export default function LoginPage(): ReactElement {
 		setSubmitting(true);
 		try {
 			if (mode === 'signup') {
-				const { data, error } = await supabase.auth.signUp({ email, password });
+				const { data, error } = await supabase.auth.signUp({
+					email,
+					password,
+					options: {
+						emailRedirectTo: `${getPublicBaseUrl()}/dashboard`,
+					},
+				});
 				if (error) throw error;
 				// When email confirmation is enabled, no session is returned until the user confirms.
 				if (data.session) {

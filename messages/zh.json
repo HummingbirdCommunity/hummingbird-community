@@ -23,7 +23,7 @@
 		"noAccount": "还没有账户？",
 		"haveAccount": "已经有账户了？",
 		"accountCreated": "账户已创建，欢迎加入！",
-		"checkEmail": "请查收邮件以确认你的账户。",
+		"checkEmail": "如果是新邮箱，请查收邮件确认账户；如果你已注册过，直接登录即可。",
 		"signedIn": "已登录。",
 		"genericError": "出错了，请重试。"
 	},
