@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 	return {
 		title,
 		description,
+		icons: { icon: '/favicon.png' },
 		openGraph: { title, description, type: 'website' },
 		twitter: { card: 'summary', title, description },
 	};

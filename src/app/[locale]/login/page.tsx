@@ -65,12 +65,12 @@ export default function LoginPage(): ReactElement {
 			<div className="w-full max-w-md">
 				<div className="mb-8 text-center">
 					<Image
-						src="/logo.png"
+						src="/hb-logo.png"
 						alt={tCommon('appName')}
-						width={96}
-						height={96}
+						width={112}
+						height={112}
 						priority
-						className="mx-auto mb-4 h-24 w-24 object-contain"
+						className="mx-auto mb-2 h-28 w-28 object-contain"
 					/>
 					<h1 className="text-foreground text-3xl font-bold">{tCommon('appName')}</h1>
 				</div>
