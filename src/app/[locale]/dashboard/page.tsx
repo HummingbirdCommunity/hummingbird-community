@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { GitHubConnectionCard } from '@/components/GitHubConnectionCard';
 import { LanguageDistribution } from '@/components/LanguageDistribution';
+import { SignatureRepos } from '@/components/SignatureRepos';
 import { SubmissionPanel } from '@/components/SubmissionPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +65,7 @@ export default function DashboardPage(): ReactElement | null {
 				<SubmissionPanel />
 				<GitHubConnectionCard />
 				<LanguageDistribution />
+				<SignatureRepos />
 				<Card>
 					<CardHeader>
 						<CardTitle className="text-2xl">

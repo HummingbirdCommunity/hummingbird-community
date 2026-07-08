@@ -84,6 +84,21 @@
 			"repoCount": "共 {count} 个仓库",
 			"lastUpdated": "更新于 {date}",
 			"paused": "已暂停更新——GitHub 已断开"
+		},
+		"signature": {
+			"title": "代表作仓库",
+			"subtitle": "置顶与星标最高的公开仓库",
+			"empty": "还没有可展示的公开仓库。",
+			"error": "无法加载代表作仓库，请稍后重试。",
+			"rateLimited": "GitHub 接口暂时受限，请稍后再试。",
+			"stale": "当前显示的是上次保存的数据——最新一次刷新未成功。",
+			"needsReauth": "重新连接 GitHub 以授权读取你的公开仓库。",
+			"reconnect": "重新连接 GitHub",
+			"fork": "Fork",
+			"stars": "{count} 个星标",
+			"forks": "{count} 个 fork",
+			"lastUpdated": "更新于 {date}",
+			"paused": "已暂停更新——GitHub 已断开"
 		}
 	},
 	"metadata": {
