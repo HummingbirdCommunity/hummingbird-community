@@ -77,3 +77,31 @@ export async function getUserFromRequest(request: Request): Promise<User | null>
 	if (error) return null;
 	return data.user;
 }
+
+export interface ResolvedTarget {
+	callerId: string;
+	targetId: string;
+	impersonating: boolean;
+}
+
+// Resolve whose data a read route should serve: the caller, or — when an admin
+// passes `?viewAs=<id>` — that target user. The admin gate is the whole security
+// boundary of the "view as user" feature (HB-15): a non-admin's `viewAs` is
+// silently ignored so they only ever get their own data, never someone else's.
+// Returns null when the caller is unauthenticated so routes can answer 401.
+export async function resolveTargetUserId(request: Request): Promise<ResolvedTarget | null> {
+	const user = await getUserFromRequest(request);
+	if (!user) return null;
+
+	const viewAs = new URL(request.url).searchParams.get('viewAs');
+	if (!viewAs || viewAs === user.id) {
+		return { callerId: user.id, targetId: user.id, impersonating: false };
+	}
+
+	const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
+	if (!profile?.is_admin) {
+		return { callerId: user.id, targetId: user.id, impersonating: false };
+	}
+
+	return { callerId: user.id, targetId: viewAs, impersonating: true };
+}

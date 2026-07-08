@@ -4,7 +4,7 @@ import { decryptToken } from '@/lib/github/crypto';
 import { GitHubRateLimitError } from '@/lib/github/errors';
 import { aggregateLanguages } from '@/lib/github/languages';
 import { hasRequiredScopes } from '@/lib/github/oauth';
-import { getUserFromRequest } from '@/lib/github/session';
+import { resolveTargetUserId } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
 
 // Runs on the Node.js runtime — decryptToken uses node:crypto.
@@ -29,8 +29,8 @@ function okResponse(snapshot: Snapshot, stale: boolean, disconnected: boolean): 
 // disconnect we keep serving the last snapshot (disconnected=true) rather than
 // dropping it. While connected, recompute when the cache is missing or stale.
 export async function GET(request: Request): Promise<NextResponse> {
-	const user = await getUserFromRequest(request);
-	if (!user) {
+	const target = await resolveTargetUserId(request);
+	if (!target) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
@@ -38,12 +38,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 		supabase
 			.from('github_connections')
 			.select('access_token_encrypted, scopes, github_username')
-			.eq('user_id', user.id)
+			.eq('user_id', target.targetId)
 			.maybeSingle(),
 		supabase
 			.from('github_language_stats')
 			.select('language_stats, repo_count, computed_at')
-			.eq('user_id', user.id)
+			.eq('user_id', target.targetId)
 			.maybeSingle(),
 	]);
 	if (connectionError || statsError) {
@@ -80,7 +80,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 		);
 		const { error: writeError } = await supabase.from('github_language_stats').upsert(
 			{
-				user_id: user.id,
+				user_id: target.targetId,
 				language_stats: aggregate.languages,
 				repo_count: aggregate.repoCount,
 				computed_at: aggregate.computedAt,

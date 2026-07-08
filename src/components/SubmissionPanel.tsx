@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 import type { SubmissionKind } from '@/lib/submissions';
 
+import { useImpersonation } from '@/components/ImpersonationProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { submitFile, validateFile } from '@/lib/submissions';
@@ -18,12 +19,18 @@ const OPTIONS: { kind: SubmissionKind; icon: LucideIcon }[] = [
 	{ kind: 'jd', icon: Briefcase },
 ];
 
-export function SubmissionPanel(): ReactElement {
+export function SubmissionPanel(): ReactElement | null {
 	const t = useTranslations('panel');
+	const { impersonatedUserId } = useImpersonation();
 	const [kind, setKind] = useState<SubmissionKind | null>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Uploads always run as the real signed-in user (Storage stamps owner_id), so
+	// there's no meaningful "submit as another account" — hide the panel while
+	// viewing another account.
+	if (impersonatedUserId) return null;
 
 	function reset() {
 		setKind(null);

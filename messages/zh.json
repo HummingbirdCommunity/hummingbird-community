@@ -101,6 +101,13 @@
 			"paused": "已暂停更新——GitHub 已断开"
 		}
 	},
+	"impersonation": {
+		"switchUser": "以用户身份查看",
+		"you": "你",
+		"viewingAs": "正在查阅 {name} 的账号",
+		"exit": "退出",
+		"readOnly": "查阅他人账号时为只读。"
+	},
 	"metadata": {
 		"description": "一个让大家连接、分享、共同成长的社区。"
 	}

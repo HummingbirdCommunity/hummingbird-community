@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server';
 
-import { getUserFromRequest } from '@/lib/github/session';
+import { resolveTargetUserId } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
 
-// Runs on the Node.js runtime — getUserFromRequest uses the server helpers.
+// Runs on the Node.js runtime — resolveTargetUserId uses the server helpers.
 export const runtime = 'nodejs';
 
 // Report whether the signed-in user has a GitHub connection. Selects only the
 // safe display fields — the token columns never leave the server.
 export async function GET(request: Request): Promise<NextResponse> {
-	const user = await getUserFromRequest(request);
-	if (!user) {
+	const target = await resolveTargetUserId(request);
+	if (!target) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	const { data, error } = await supabase
 		.from('github_connections')
 		.select('github_username, connected_at')
-		.eq('user_id', user.id)
+		.eq('user_id', target.targetId)
 		.maybeSingle();
 	if (error) {
 		return NextResponse.json({ error: 'Failed to load status' }, { status: 500 });
