@@ -5,7 +5,7 @@ import type { SignatureRepo } from '@/lib/github/signature';
 import { decryptToken } from '@/lib/github/crypto';
 import { GitHubRateLimitError } from '@/lib/github/errors';
 import { hasRequiredScopes } from '@/lib/github/oauth';
-import { getUserFromRequest } from '@/lib/github/session';
+import { resolveTargetUserId } from '@/lib/github/session';
 import { aggregateSignatureRepos } from '@/lib/github/signature';
 import { supabase } from '@/lib/supabase/server';
 
@@ -30,8 +30,8 @@ function okResponse(snapshot: Snapshot, stale: boolean, disconnected: boolean): 
 // disconnect we keep serving the last snapshot (disconnected=true) rather than
 // dropping it. While connected, recompute when the cache is missing or stale.
 export async function GET(request: Request): Promise<NextResponse> {
-	const user = await getUserFromRequest(request);
-	if (!user) {
+	const target = await resolveTargetUserId(request);
+	if (!target) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
@@ -39,9 +39,13 @@ export async function GET(request: Request): Promise<NextResponse> {
 		supabase
 			.from('github_connections')
 			.select('access_token_encrypted, scopes, github_username')
-			.eq('user_id', user.id)
+			.eq('user_id', target.targetId)
 			.maybeSingle(),
-		supabase.from('github_signature_repos').select('repos, computed_at').eq('user_id', user.id).maybeSingle(),
+		supabase
+			.from('github_signature_repos')
+			.select('repos, computed_at')
+			.eq('user_id', target.targetId)
+			.maybeSingle(),
 	]);
 	if (connectionError || snapshotError) {
 		return NextResponse.json({ error: 'Failed to load signature repos' }, { status: 500 });
@@ -73,7 +77,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 		);
 		const { error: writeError } = await supabase.from('github_signature_repos').upsert(
 			{
-				user_id: user.id,
+				user_id: target.targetId,
 				repos: aggregate.repos,
 				computed_at: aggregate.computedAt,
 			},
