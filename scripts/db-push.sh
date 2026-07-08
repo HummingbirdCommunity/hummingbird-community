@@ -3,7 +3,7 @@
 # Apply Supabase migrations to a specific environment.
 #
 #   scripts/db-push.sh staging   # -> project cywuejplvgajgtmevxrv (preview/local)
-#   scripts/db-push.sh prod      # -> project mggqxpaxtewwyiyqmsrv (production)
+#   scripts/db-push.sh prod      # -> project mggqxpaxtewwyiyqmsrw (production)
 #
 # Reads the target's DB password from .env.local:
 #   STAGING_DB_PASSWORD=...   (staging)
