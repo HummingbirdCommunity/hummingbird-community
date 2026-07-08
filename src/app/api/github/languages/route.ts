@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { decryptToken } from '@/lib/github/crypto';
-import { aggregateLanguages, GitHubRateLimitError } from '@/lib/github/languages';
+import { GitHubRateLimitError } from '@/lib/github/errors';
+import { aggregateLanguages } from '@/lib/github/languages';
 import { hasRequiredScopes } from '@/lib/github/oauth';
 import { getUserFromRequest } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
