@@ -130,7 +130,10 @@ export function LanguageDistribution(): ReactElement | null {
 				) : data.status === 'needs-reauth' ? (
 					<div className="space-y-3">
 						<p className="text-muted-foreground text-sm">{t('needsReauth')}</p>
-						<Button onClick={() => reconnect.mutate()} disabled={reconnect.isPending}>
+						<Button
+							onClick={() => reconnect.mutate()}
+							disabled={reconnect.isPending || Boolean(impersonatedUserId)}
+						>
 							<Github className="h-4 w-4" />
 							{t('reconnect')}
 						</Button>

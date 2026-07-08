@@ -19,6 +19,7 @@ const LANGUAGES_KEY = ['github-languages'];
 export function GitHubConnectionCard(): ReactElement {
 	const t = useTranslations('github');
 	const tCommon = useTranslations('common');
+	const tImpersonation = useTranslations('impersonation');
 	const queryClient = useQueryClient();
 	const { impersonatedUserId } = useImpersonation();
 
@@ -74,6 +75,10 @@ export function GitHubConnectionCard(): ReactElement {
 			<CardContent>
 				{isPending ? (
 					<span className="text-muted-foreground text-sm">{tCommon('loading')}</span>
+				) : impersonatedUserId ? (
+					// Connect/disconnect act on the real signed-in user, so hide them while
+					// impersonating — the card stays a read-only view of the target's status.
+					<span className="text-muted-foreground text-sm">{tImpersonation('readOnly')}</span>
 				) : data?.connected ? (
 					<Button
 						variant="outline"

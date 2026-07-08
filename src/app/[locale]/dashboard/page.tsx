@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { GitHubConnectionCard } from '@/components/GitHubConnectionCard';
+import { ImpersonationBar } from '@/components/ImpersonationBar';
+import { useImpersonation } from '@/components/ImpersonationProvider';
 import { LanguageDistribution } from '@/components/LanguageDistribution';
 import { SignatureRepos } from '@/components/SignatureRepos';
 import { SubmissionPanel } from '@/components/SubmissionPanel';
@@ -21,6 +23,7 @@ export default function DashboardPage(): ReactElement | null {
 	const t = useTranslations('dashboard');
 	const tCommon = useTranslations('common');
 	const { isLoggedIn, user, userEmail, loading } = useAuth();
+	const { impersonatedUserId } = useImpersonation();
 	const [displayName, setDisplayName] = useState<string | null>(null);
 
 	// Gate: send unauthenticated visitors to the login page.
@@ -62,34 +65,41 @@ export default function DashboardPage(): ReactElement | null {
 	return (
 		<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
 			<div className="w-full max-w-lg space-y-6">
+				<ImpersonationBar />
+				{/* Panel and welcome card are about your own account; while viewing another
+				    user only their GitHub cards (and the impersonation bar) are shown. */}
 				<SubmissionPanel />
 				<GitHubConnectionCard />
 				<LanguageDistribution />
 				<SignatureRepos />
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-2xl">
-							{displayName ? t('welcomeNamed', { name: displayName }) : t('welcome')}
-						</CardTitle>
-						<CardDescription>{t('signedInDescription', { appName: tCommon('appName') })}</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<dl className="text-sm">
-							<div className="flex justify-between border-b py-2">
-								<dt className="text-muted-foreground">{tCommon('email')}</dt>
-								<dd className="font-medium">{userEmail}</dd>
-							</div>
-							<div className="flex justify-between py-2">
-								<dt className="text-muted-foreground">{t('userId')}</dt>
-								<dd className="font-mono text-xs">{user?.id}</dd>
-							</div>
-						</dl>
-						<Button variant="outline" className="w-full" onClick={handleSignOut}>
-							<LogOut className="h-4 w-4" />
-							{t('signOut')}
-						</Button>
-					</CardContent>
-				</Card>
+				{!impersonatedUserId && (
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-2xl">
+								{displayName ? t('welcomeNamed', { name: displayName }) : t('welcome')}
+							</CardTitle>
+							<CardDescription>
+								{t('signedInDescription', { appName: tCommon('appName') })}
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<dl className="text-sm">
+								<div className="flex justify-between border-b py-2">
+									<dt className="text-muted-foreground">{tCommon('email')}</dt>
+									<dd className="font-medium">{userEmail}</dd>
+								</div>
+								<div className="flex justify-between py-2">
+									<dt className="text-muted-foreground">{t('userId')}</dt>
+									<dd className="font-mono text-xs">{user?.id}</dd>
+								</div>
+							</dl>
+							<Button variant="outline" className="w-full" onClick={handleSignOut}>
+								<LogOut className="h-4 w-4" />
+								{t('signOut')}
+							</Button>
+						</CardContent>
+					</Card>
+				)}
 			</div>
 		</div>
 	);
