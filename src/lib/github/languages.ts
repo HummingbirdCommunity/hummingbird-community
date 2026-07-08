@@ -1,9 +1,10 @@
 // Aggregate the language byte-counts across a user's public repositories (HB-7).
 // Server-only — used by the /api/github/languages route with a decrypted token.
 
+import { GitHubRateLimitError } from '@/lib/github/errors';
+import { isRateLimited, REQUEST_TIMEOUT_MS, USER_AGENT } from '@/lib/github/http';
+
 const API_BASE = 'https://api.github.com';
-const USER_AGENT = 'hummingbird-community';
-const REQUEST_TIMEOUT_MS = 10_000;
 
 // GitHub's max page size, so repo listing needs the fewest round-trips.
 const PER_PAGE = 100;
@@ -13,20 +14,6 @@ const MAX_PAGES = 10;
 // Fan-out is one request per repo (fork probe + languages), so cap in-flight
 // calls to stay well under GitHub's secondary-rate-limit thresholds.
 const CONCURRENCY = 5;
-
-// Distinct from a generic failure so the route can surface a "try again later"
-// state instead of a hard error when GitHub throttles us.
-export class GitHubRateLimitError extends Error {
-	constructor() {
-		super('GitHub API rate limit exceeded');
-		this.name = 'GitHubRateLimitError';
-	}
-}
-
-function isRateLimited(response: Response): boolean {
-	if (response.status === 429) return true;
-	return response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0';
-}
 
 async function ghFetch(accessToken: string, path: string): Promise<Response> {
 	const response = await fetch(`${API_BASE}${path}`, {

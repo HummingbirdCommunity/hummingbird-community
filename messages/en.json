@@ -84,6 +84,21 @@
 			"repoCount": "Across {count, plural, one {# repository} other {# repositories}}",
 			"lastUpdated": "Updated {date}",
 			"paused": "Updates paused — GitHub disconnected"
+		},
+		"signature": {
+			"title": "Signature repositories",
+			"subtitle": "Pinned and top-starred public repositories",
+			"empty": "No public repositories to show yet.",
+			"error": "Couldn't load your signature repositories. Please try again later.",
+			"rateLimited": "GitHub is rate-limiting us right now. Please try again in a bit.",
+			"stale": "Showing the last saved data — the latest refresh didn't go through.",
+			"needsReauth": "Reconnect GitHub to grant access to your public repositories.",
+			"reconnect": "Reconnect GitHub",
+			"fork": "Fork",
+			"stars": "{count, plural, one {# star} other {# stars}}",
+			"forks": "{count, plural, one {# fork} other {# forks}}",
+			"lastUpdated": "Updated {date}",
+			"paused": "Updates paused — GitHub disconnected"
 		}
 	},
 	"metadata": {

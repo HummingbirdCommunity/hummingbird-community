@@ -1,3 +1,5 @@
+import type { SignatureRepo } from '@/lib/github/signature';
+
 import { supabase } from '@/lib/supabase/client';
 
 // Browser-side calls to the /api/github/* routes. Each attaches the Supabase
@@ -55,5 +57,24 @@ export type LanguagesResponse =
 export async function getLanguages(): Promise<LanguagesResponse> {
 	const response = await fetch('/api/github/languages', { headers: await authHeaders() });
 	if (!response.ok) throw new Error('Failed to load language distribution');
+	return response.json();
+}
+
+export type SignatureReposResponse =
+	| {
+			status: 'ok';
+			repos: SignatureRepo[];
+			computedAt: string;
+			stale: boolean;
+			disconnected: boolean;
+	  }
+	| { status: 'needs-reauth' }
+	| { status: 'rate-limited' }
+	| { status: 'error' }
+	| { status: 'no-data' };
+
+export async function getSignatureRepos(): Promise<SignatureReposResponse> {
+	const response = await fetch('/api/github/signature', { headers: await authHeaders() });
+	if (!response.ok) throw new Error('Failed to load signature repositories');
 	return response.json();
 }
