@@ -1,5 +1,6 @@
 import type { SignatureRepo } from '@/lib/github/signature';
 
+import { IMPERSONATION_STORAGE_KEY } from '@/components/ImpersonationProvider';
 import { supabase } from '@/lib/supabase/client';
 
 // Browser-side calls to the /api/github/* routes. Each attaches the Supabase
@@ -20,8 +21,23 @@ async function authHeaders(): Promise<Record<string, string>> {
 	return { Authorization: `Bearer ${session.access_token}` };
 }
 
+// When an admin is viewing another account, forward the target as ?viewAs=. Read
+// from sessionStorage (not React) so these plain functions stay hook-free; the
+// server ignores the param for non-admins, so it's safe to always send.
+function viewAsQuery(): string {
+	if (typeof window === 'undefined') return '';
+	const raw = window.sessionStorage.getItem(IMPERSONATION_STORAGE_KEY);
+	if (!raw) return '';
+	try {
+		const { userId } = JSON.parse(raw) as { userId?: string };
+		return userId ? `?viewAs=${encodeURIComponent(userId)}` : '';
+	} catch {
+		return '';
+	}
+}
+
 export async function getStatus(): Promise<GitHubStatus> {
-	const response = await fetch('/api/github/status', { headers: await authHeaders() });
+	const response = await fetch(`/api/github/status${viewAsQuery()}`, { headers: await authHeaders() });
 	if (!response.ok) throw new Error('Failed to load GitHub status');
 	return response.json();
 }
@@ -55,7 +71,7 @@ export type LanguagesResponse =
 	| { status: 'no-data' };
 
 export async function getLanguages(): Promise<LanguagesResponse> {
-	const response = await fetch('/api/github/languages', { headers: await authHeaders() });
+	const response = await fetch(`/api/github/languages${viewAsQuery()}`, { headers: await authHeaders() });
 	if (!response.ok) throw new Error('Failed to load language distribution');
 	return response.json();
 }
@@ -74,7 +90,7 @@ export type SignatureReposResponse =
 	| { status: 'no-data' };
 
 export async function getSignatureRepos(): Promise<SignatureReposResponse> {
-	const response = await fetch('/api/github/signature', { headers: await authHeaders() });
+	const response = await fetch(`/api/github/signature${viewAsQuery()}`, { headers: await authHeaders() });
 	if (!response.ok) throw new Error('Failed to load signature repositories');
 	return response.json();
 }

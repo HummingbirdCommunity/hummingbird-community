@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import type { SignatureRepo } from '@/lib/github/signature';
 
+import { useImpersonation } from '@/components/ImpersonationProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignatureRepos, startConnect } from '@/lib/github/client';
@@ -86,8 +87,12 @@ function RepoList({
 export function SignatureRepos(): ReactElement | null {
 	const t = useTranslations('github.signature');
 	const tCommon = useTranslations('common');
+	const { impersonatedUserId } = useImpersonation();
 
-	const { data, isPending } = useQuery({ queryKey: ['github-signature'], queryFn: getSignatureRepos });
+	const { data, isPending } = useQuery({
+		queryKey: ['github-signature', impersonatedUserId],
+		queryFn: getSignatureRepos,
+	});
 	const reconnect = useMutation({ mutationFn: startConnect, onError: () => toast.error(t('error')) });
 
 	// Nothing to show for a user who has never connected — the connection card

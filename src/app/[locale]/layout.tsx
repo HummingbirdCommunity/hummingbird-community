@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+import { ImpersonationProvider } from '@/components/ImpersonationProvider';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { QueryProvider } from '@/components/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
@@ -55,7 +56,9 @@ export default async function LocaleLayout({
 					<div className="fixed top-4 right-4 z-50">
 						<LanguageSwitcher />
 					</div>
-					<QueryProvider>{children}</QueryProvider>
+					<QueryProvider>
+						<ImpersonationProvider>{children}</ImpersonationProvider>
+					</QueryProvider>
 					<Toaster />
 				</NextIntlClientProvider>
 			</body>

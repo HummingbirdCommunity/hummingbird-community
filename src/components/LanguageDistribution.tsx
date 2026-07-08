@@ -6,6 +6,7 @@ import { Github } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
+import { useImpersonation } from '@/components/ImpersonationProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getLanguages, startConnect } from '@/lib/github/client';
@@ -105,8 +106,9 @@ function LanguageChart({
 export function LanguageDistribution(): ReactElement | null {
 	const t = useTranslations('github.languages');
 	const tCommon = useTranslations('common');
+	const { impersonatedUserId } = useImpersonation();
 
-	const { data, isPending } = useQuery({ queryKey: ['github-languages'], queryFn: getLanguages });
+	const { data, isPending } = useQuery({ queryKey: ['github-languages', impersonatedUserId], queryFn: getLanguages });
 	const reconnect = useMutation({ mutationFn: startConnect, onError: () => toast.error(t('error')) });
 
 	// Nothing to show for a user who has never connected — the connection card

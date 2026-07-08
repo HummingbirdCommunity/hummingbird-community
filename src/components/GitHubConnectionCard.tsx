@@ -7,10 +7,12 @@ import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
+import { useImpersonation } from '@/components/ImpersonationProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { disconnect, getStatus, startConnect } from '@/lib/github/client';
 
+// Bare prefixes for invalidation — they prefix-match every per-user scoped key.
 const STATUS_KEY = ['github-status'];
 const LANGUAGES_KEY = ['github-languages'];
 
@@ -18,8 +20,11 @@ export function GitHubConnectionCard(): ReactElement {
 	const t = useTranslations('github');
 	const tCommon = useTranslations('common');
 	const queryClient = useQueryClient();
+	const { impersonatedUserId } = useImpersonation();
 
-	const { data, isPending } = useQuery({ queryKey: STATUS_KEY, queryFn: getStatus });
+	// Scope the query per viewed user so switching accounts refetches instead of
+	// showing the previous user's status.
+	const { data, isPending } = useQuery({ queryKey: [...STATUS_KEY, impersonatedUserId], queryFn: getStatus });
 
 	const connect = useMutation({
 		mutationFn: startConnect,
