@@ -45,7 +45,11 @@ export default async function LocaleLayout({
 	setRequestLocale(locale);
 
 	return (
-		<html lang={locale}>
+		// translate="no": the app is fully bilingual (en/zh) with its own switcher,
+		// so Chrome's auto-translate prompt (fired when a page's lang differs from the
+		// browser language, e.g. a zh browser pinned to the en locale) is redundant
+		// noise. Suppress it site-wide (HB-14).
+		<html lang={locale} translate="no">
 			<body className="antialiased">
 				<NextIntlClientProvider>
 					<div className="fixed top-4 right-4 z-50">
