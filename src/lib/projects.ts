@@ -38,6 +38,14 @@ export function validateLogo(file: File): LogoValidationError | null {
 	return null;
 }
 
+// Add https:// to a bare host (github.com/x) so it becomes a clickable link;
+// inputs that already carry a scheme are left for the render-time allowlist.
+function normalizeRepoUrl(raw: string | undefined): string | null {
+	const trimmed = raw?.trim();
+	if (!trimmed) return null;
+	return /^[a-z][a-z0-9+.-]*:/i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 export async function createProject(input: CreateProjectInput): Promise<void> {
 	// Run as the signed-in user so Storage stamps owner_id — the logo bucket's RLS
 	// keys off ownership, and the row insert must satisfy auth.uid() = owner_id.
@@ -62,7 +70,7 @@ export async function createProject(input: CreateProjectInput): Promise<void> {
 		name: input.name.trim(),
 		tagline: input.tagline.trim(),
 		manifesto: input.manifesto.trim(),
-		repo_url: input.repoUrl?.trim() || null,
+		repo_url: normalizeRepoUrl(input.repoUrl),
 		logo_path: logoPath,
 	});
 	if (insertError) {
