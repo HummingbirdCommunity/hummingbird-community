@@ -4,10 +4,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { ImpersonationProvider } from '@/components/ImpersonationProvider';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { QueryProvider } from '@/components/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
-import { UserSwitcher } from '@/components/UserSwitcher';
 import { routing } from '@/i18n/routing';
 
 import '../globals.css';
@@ -55,15 +53,7 @@ export default async function LocaleLayout({
 			<body className="antialiased">
 				<NextIntlClientProvider>
 					<QueryProvider>
-						<ImpersonationProvider>
-							<div className="fixed top-4 left-4 z-50">
-								<UserSwitcher />
-							</div>
-							<div className="fixed top-4 right-4 z-50">
-								<LanguageSwitcher />
-							</div>
-							{children}
-						</ImpersonationProvider>
+						<ImpersonationProvider>{children}</ImpersonationProvider>
 					</QueryProvider>
 					<Toaster />
 				</NextIntlClientProvider>
