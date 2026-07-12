@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { FloatingLanguageSwitcher } from '@/components/FloatingLanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -68,74 +69,77 @@ export default function LoginPage(): ReactElement {
 	}
 
 	return (
-		<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
-			<div className="w-full max-w-md">
-				<div className="mb-8 text-center">
-					<Image
-						src="/hb-logo.png"
-						alt={tCommon('appName')}
-						width={112}
-						height={112}
-						priority
-						className="mx-auto mb-2 h-28 w-28 object-contain"
-					/>
-					<h1 className="text-foreground text-3xl font-bold">{tCommon('appName')}</h1>
+		<>
+			<FloatingLanguageSwitcher />
+			<div className="bg-app-canvas flex min-h-screen items-center justify-center p-4">
+				<div className="w-full max-w-md">
+					<div className="mb-8 text-center">
+						<Image
+							src="/hb-logo.png"
+							alt={tCommon('appName')}
+							width={112}
+							height={112}
+							priority
+							className="mx-auto mb-2 h-28 w-28 object-contain"
+						/>
+						<h1 className="text-foreground text-3xl font-bold">{tCommon('appName')}</h1>
+					</div>
+
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-xl">
+								{mode === 'signin' ? t('welcomeBack') : t('createAccount')}
+							</CardTitle>
+							<CardDescription>
+								{mode === 'signin' ? t('signinSubtitle') : t('signupSubtitle')}
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<form onSubmit={handleSubmit} className="space-y-4">
+								<div className="space-y-2">
+									<Label htmlFor="email">{tCommon('email')}</Label>
+									<Input
+										id="email"
+										type="email"
+										autoComplete="email"
+										required
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										placeholder="you@example.com"
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="password">{t('password')}</Label>
+									<Input
+										id="password"
+										type="password"
+										autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+										required
+										minLength={6}
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
+										placeholder="••••••••"
+									/>
+								</div>
+								<Button type="submit" className="w-full" disabled={submitting}>
+									{submitting ? t('pleaseWait') : mode === 'signin' ? t('signIn') : t('signUp')}
+								</Button>
+							</form>
+
+							<p className="text-muted-foreground mt-4 text-center text-sm">
+								{mode === 'signin' ? t('noAccount') : t('haveAccount')}{' '}
+								<button
+									type="button"
+									className="text-primary font-medium hover:underline"
+									onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+								>
+									{mode === 'signin' ? t('signUp') : t('signIn')}
+								</button>
+							</p>
+						</CardContent>
+					</Card>
 				</div>
-
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-xl">
-							{mode === 'signin' ? t('welcomeBack') : t('createAccount')}
-						</CardTitle>
-						<CardDescription>
-							{mode === 'signin' ? t('signinSubtitle') : t('signupSubtitle')}
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<form onSubmit={handleSubmit} className="space-y-4">
-							<div className="space-y-2">
-								<Label htmlFor="email">{tCommon('email')}</Label>
-								<Input
-									id="email"
-									type="email"
-									autoComplete="email"
-									required
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									placeholder="you@example.com"
-								/>
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="password">{t('password')}</Label>
-								<Input
-									id="password"
-									type="password"
-									autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-									required
-									minLength={6}
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									placeholder="••••••••"
-								/>
-							</div>
-							<Button type="submit" className="w-full" disabled={submitting}>
-								{submitting ? t('pleaseWait') : mode === 'signin' ? t('signIn') : t('signUp')}
-							</Button>
-						</form>
-
-						<p className="text-muted-foreground mt-4 text-center text-sm">
-							{mode === 'signin' ? t('noAccount') : t('haveAccount')}{' '}
-							<button
-								type="button"
-								className="text-primary font-medium hover:underline"
-								onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-							>
-								{mode === 'signin' ? t('signUp') : t('signIn')}
-							</button>
-						</p>
-					</CardContent>
-				</Card>
 			</div>
-		</div>
+		</>
 	);
 }
