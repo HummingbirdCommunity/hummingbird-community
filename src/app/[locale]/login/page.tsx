@@ -27,10 +27,10 @@ export default function LoginPage(): ReactElement {
 	const [password, setPassword] = useState('');
 	const [submitting, setSubmitting] = useState(false);
 
-	// Already signed in? Bounce to the dashboard.
+	// Already signed in? Bounce to their profile.
 	useEffect(() => {
 		if (!authLoading && isLoggedIn) {
-			router.replace('/dashboard');
+			router.replace('/profile');
 		}
 	}, [authLoading, isLoggedIn, router]);
 
@@ -43,14 +43,14 @@ export default function LoginPage(): ReactElement {
 					email,
 					password,
 					options: {
-						emailRedirectTo: `${getPublicBaseUrl()}/dashboard`,
+						emailRedirectTo: `${getPublicBaseUrl()}/profile`,
 					},
 				});
 				if (error) throw error;
 				// When email confirmation is enabled, no session is returned until the user confirms.
 				if (data.session) {
 					toast.success(t('accountCreated'));
-					router.replace('/dashboard');
+					router.replace('/profile');
 				} else {
 					toast.success(t('checkEmail'));
 				}
@@ -58,7 +58,7 @@ export default function LoginPage(): ReactElement {
 				const { error } = await supabase.auth.signInWithPassword({ email, password });
 				if (error) throw error;
 				toast.success(t('signedIn'));
-				router.replace('/dashboard');
+				router.replace('/profile');
 			}
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : t('genericError'));

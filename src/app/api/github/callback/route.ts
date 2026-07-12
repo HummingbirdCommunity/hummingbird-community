@@ -16,7 +16,7 @@ function toTimestamp(epochMs: number | null): string | null {
 
 // Complete the OAuth flow: verify the signed state, exchange the code for a
 // token, look up the GitHub identity, store it encrypted, then bounce the user
-// back to the dashboard. Always clears the one-time state cookie.
+// back to their profile. Always clears the one-time state cookie.
 export async function GET(request: NextRequest): Promise<NextResponse> {
 	const url = new URL(request.url);
 	const code = url.searchParams.get('code');
@@ -24,14 +24,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 	const cookieState = decodeState(request.cookies.get(STATE_COOKIE)?.value);
 
 	function redirect(status: 'connected' | 'error' | 'already-linked'): NextResponse {
-		// Return the user to the dashboard in the language they left from. The
+		// Return the user to their profile in the language they left from. The
 		// callback path carries no locale, so read next-intl's own NEXT_LOCALE
 		// cookie; `as-needed` routing means the default locale takes no prefix.
 		const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
 		const locale = (routing.locales as readonly string[]).includes(cookieLocale ?? '')
 			? cookieLocale
 			: routing.defaultLocale;
-		const path = locale === routing.defaultLocale ? '/dashboard' : `/${locale}/dashboard`;
+		const path = locale === routing.defaultLocale ? '/profile' : `/${locale}/profile`;
 
 		const target = new URL(path, request.url);
 		target.searchParams.set('github', status);
