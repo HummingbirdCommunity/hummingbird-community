@@ -6,6 +6,11 @@
 		"loading": "加载中…",
 		"switchLanguage": "切换语言"
 	},
+	"nav": {
+		"myProfile": "我的主页",
+		"explore": "探索",
+		"myProject": "我的项目"
+	},
 	"home": {
 		"tagline": "一个让远程工作者连接、分享、共同成长的地方。",
 		"comingSoon": "即将上线",

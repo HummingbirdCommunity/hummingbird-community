@@ -6,6 +6,11 @@
 		"loading": "Loading…",
 		"switchLanguage": "Switch language"
 	},
+	"nav": {
+		"myProfile": "My Profile",
+		"explore": "Explore",
+		"myProject": "My Project"
+	},
 	"home": {
 		"tagline": "A place for remote workers to connect, share, and grow together.",
 		"comingSoon": "Coming soon",
