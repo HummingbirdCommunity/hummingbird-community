@@ -17,11 +17,13 @@ export default async function AppLayout({
 
 	return (
 		<AuthGate>
-			<div className="bg-app-canvas flex min-h-screen">
-				<Sidebar />
-				<div className="flex min-w-0 flex-1 flex-col">
-					<Header />
-					<main className="flex-1">{children}</main>
+			{/* Viewport-locked shell: the header stays fixed on top while the sidebar
+			    and main content each scroll in their own pane. */}
+			<div className="bg-app-canvas flex h-dvh flex-col overflow-hidden">
+				<Header />
+				<div className="flex min-h-0 flex-1">
+					<Sidebar />
+					<main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
 				</div>
 			</div>
 		</AuthGate>

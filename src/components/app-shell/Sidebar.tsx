@@ -3,7 +3,6 @@
 import type { ReactElement } from 'react';
 import { Compass, FolderKanban, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -19,25 +18,12 @@ const navItems = [
 
 export function Sidebar(): ReactElement {
 	const t = useTranslations('nav');
-	const tCommon = useTranslations('common');
 	const pathname = usePathname();
 
+	// Own scroll panel: overflow-y-auto so a long nav scrolls independently of the
+	// main content rather than moving the whole page.
 	return (
-		<aside className="bg-card flex w-16 shrink-0 flex-col border-r md:w-60">
-			<Link
-				href="/profile"
-				className="hover:bg-accent flex items-center gap-2 border-b px-3 py-4 transition-colors md:px-4"
-			>
-				<Image
-					src="/hb-logo.png"
-					alt={tCommon('appName')}
-					width={32}
-					height={32}
-					className="h-8 w-8 shrink-0 object-contain"
-				/>
-				<span className="text-foreground hidden truncate font-semibold md:inline">{tCommon('appName')}</span>
-			</Link>
-
+		<aside className="bg-card flex w-16 shrink-0 flex-col overflow-y-auto border-r md:w-60">
 			<nav aria-label={t('primary')} className="flex flex-1 flex-col gap-1 p-2 md:p-3">
 				{navItems.map(({ href, labelKey, Icon }) => {
 					const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -47,11 +33,11 @@ export function Sidebar(): ReactElement {
 							href={href}
 							aria-current={active ? 'page' : undefined}
 							className={cn(
-								'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+								'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
 								'justify-center md:justify-start',
 								active
-									? 'bg-accent text-accent-foreground'
-									: 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'
+									? 'bg-deep-ink text-white'
+									: 'text-foreground/80 hover:bg-muted hover:text-foreground'
 							)}
 						>
 							<Icon className="size-5 shrink-0" aria-hidden />
