@@ -1,0 +1,101 @@
+'use client';
+
+import type { ReactElement } from 'react';
+import { LogOut } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+import { GitHubConnectionCard } from '@/components/GitHubConnectionCard';
+import { ImpersonationBar } from '@/components/ImpersonationBar';
+import { useImpersonation } from '@/components/ImpersonationProvider';
+import { LanguageDistribution } from '@/components/LanguageDistribution';
+import { SignatureRepos } from '@/components/SignatureRepos';
+import { SubmissionPanel } from '@/components/SubmissionPanel';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from '@/i18n/navigation';
+import { supabase } from '@/lib/supabase/client';
+
+export default function ProfilePage(): ReactElement {
+	const router = useRouter();
+	const t = useTranslations('dashboard');
+	const tCommon = useTranslations('common');
+	const { user, userEmail, loading } = useAuth();
+	const { impersonatedUserId } = useImpersonation();
+	const [displayName, setDisplayName] = useState<string | null>(null);
+
+	// Load the signed-in user's profile row (created automatically on signup).
+	useEffect(() => {
+		if (!user) return;
+		supabase
+			.from('profiles')
+			.select('display_name')
+			.eq('id', user.id)
+			.maybeSingle()
+			.then(({ data }) => setDisplayName(data?.display_name ?? null));
+	}, [user]);
+
+	async function handleSignOut() {
+		const { error } = await supabase.auth.signOut();
+		if (error) {
+			toast.error(error.message);
+			return;
+		}
+		toast.success(t('signedOut'));
+		router.replace('/login');
+	}
+
+	// AuthGate guarantees a signed-in user before this renders; this only covers
+	// the brief window while this component's own auth state resolves.
+	if (loading) {
+		return (
+			<div className="text-muted-foreground flex min-h-[50vh] items-center justify-center">
+				{tCommon('loading')}
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex justify-center p-4">
+			<div className="w-full max-w-lg space-y-6">
+				<ImpersonationBar />
+				{/* Panel and welcome card are about your own account; while viewing another
+				    user only their GitHub cards (and the impersonation bar) are shown. */}
+				<SubmissionPanel />
+				<GitHubConnectionCard />
+				<LanguageDistribution />
+				<SignatureRepos />
+				{!impersonatedUserId && (
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-2xl">
+								{displayName ? t('welcomeNamed', { name: displayName }) : t('welcome')}
+							</CardTitle>
+							<CardDescription>
+								{t('signedInDescription', { appName: tCommon('appName') })}
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<dl className="text-sm">
+								<div className="flex justify-between border-b py-2">
+									<dt className="text-muted-foreground">{tCommon('email')}</dt>
+									<dd className="font-medium">{userEmail}</dd>
+								</div>
+								<div className="flex justify-between py-2">
+									<dt className="text-muted-foreground">{t('userId')}</dt>
+									<dd className="font-mono text-xs">{user?.id}</dd>
+								</div>
+							</dl>
+							<Button variant="outline" className="w-full" onClick={handleSignOut}>
+								<LogOut className="h-4 w-4" />
+								{t('signOut')}
+							</Button>
+						</CardContent>
+					</Card>
+				)}
+			</div>
+		</div>
+	);
+}
