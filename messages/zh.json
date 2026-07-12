@@ -70,6 +70,39 @@
 		"errorNotPdf": "请选择 PDF 文件。",
 		"errorGeneric": "上传失败，请重试。"
 	},
+	"project": {
+		"launchTitle": "发起一个项目",
+		"launchSubtitle": "把你正在做的项目分享给社区。",
+		"launchCta": "发起项目",
+		"form": {
+			"title": "发起一个项目",
+			"subtitle": "告诉社区你在做什么、为什么做。",
+			"nameLabel": "项目名称",
+			"namePlaceholder": "例如：蜂鸟社区",
+			"taglineLabel": "一句话简介",
+			"taglinePlaceholder": "用一句话概括你的项目。",
+			"manifestoLabel": "项目启动书",
+			"manifestoHint": "为什么做这个项目？你的初心是什么？写下这段开始时的思考。",
+			"manifestoPlaceholder": "写写你为什么发起这个项目、你的初心是什么……",
+			"repoUrlLabel": "仓库 / 演示地址",
+			"repoUrlPlaceholder": "https://github.com/you/project",
+			"logoLabel": "项目 Logo",
+			"chooseLogo": "选择图片",
+			"logoHint": "PNG、JPG 或 WebP，不超过 2MB。选填。",
+			"charCount": "{count}/{max}",
+			"submit": "发起",
+			"submitting": "发起中…",
+			"cancel": "取消",
+			"success": "你的项目已发布。🎉",
+			"errorLogoType": "请选择 PNG、JPG 或 WebP 图片。",
+			"errorLogoTooLarge": "图片超过 2MB 上限。",
+			"errorGeneric": "发起失败，请重试。"
+		},
+		"list": {
+			"empty": "还没有项目，来发起第一个吧。",
+			"viewProject": "查看项目"
+		}
+	},
 	"github": {
 		"title": "GitHub",
 		"subtitle": "连接你的 GitHub 账号即可开始。",
