@@ -6,6 +6,17 @@
 		"loading": "加载中…",
 		"switchLanguage": "切换语言"
 	},
+	"nav": {
+		"primary": "主导航",
+		"myProfile": "我的主页",
+		"explore": "探索",
+		"myProject": "我的项目"
+	},
+	"pages": {
+		"comingSoon": "即将上线",
+		"exploreSubtitle": "发现社区里的人、项目和机会。",
+		"myProjectSubtitle": "在这里跟踪和管理你参与的项目。"
+	},
 	"home": {
 		"tagline": "一个让远程工作者连接、分享、共同成长的地方。",
 		"comingSoon": "即将上线",

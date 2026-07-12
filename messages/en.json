@@ -6,6 +6,17 @@
 		"loading": "Loading…",
 		"switchLanguage": "Switch language"
 	},
+	"nav": {
+		"primary": "Primary",
+		"myProfile": "My Profile",
+		"explore": "Explore",
+		"myProject": "My Project"
+	},
+	"pages": {
+		"comingSoon": "Coming soon",
+		"exploreSubtitle": "Discover people, projects, and opportunities across the community.",
+		"myProjectSubtitle": "Track and manage the projects you're part of."
+	},
 	"home": {
 		"tagline": "A place for remote workers to connect, share, and grow together.",
 		"comingSoon": "Coming soon",
