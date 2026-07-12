@@ -70,6 +70,39 @@
 		"errorNotPdf": "Please choose a PDF file.",
 		"errorGeneric": "Upload failed. Please try again."
 	},
+	"project": {
+		"launchTitle": "Launch a project",
+		"launchSubtitle": "Share what you're building with the community.",
+		"launchCta": "Launch a project",
+		"form": {
+			"title": "Launch a project",
+			"subtitle": "Tell the community what you're building and why.",
+			"nameLabel": "Project name",
+			"namePlaceholder": "e.g. Hummingbird Community",
+			"taglineLabel": "One-line intro",
+			"taglinePlaceholder": "Sum up your project in one sentence.",
+			"manifestoLabel": "Project manifesto",
+			"manifestoHint": "Why are you building this? What's the intention behind it? Share the thinking that started it.",
+			"manifestoPlaceholder": "Write about why you started this project and what your original intention is…",
+			"repoUrlLabel": "Repository / demo URL",
+			"repoUrlPlaceholder": "https://github.com/you/project",
+			"logoLabel": "Logo",
+			"chooseLogo": "Choose an image",
+			"logoHint": "PNG, JPG or WebP, up to 2MB. Optional.",
+			"charCount": "{count}/{max}",
+			"submit": "Launch",
+			"submitting": "Launching…",
+			"cancel": "Cancel",
+			"success": "Your project is live. 🎉",
+			"errorLogoType": "Please choose a PNG, JPG or WebP image.",
+			"errorLogoTooLarge": "That image is over the 2MB limit.",
+			"errorGeneric": "Couldn't launch your project. Please try again."
+		},
+		"list": {
+			"empty": "No projects yet. Be the first to launch one.",
+			"viewProject": "View project"
+		}
+	},
 	"github": {
 		"title": "GitHub",
 		"subtitle": "Connect your GitHub account to get started.",
