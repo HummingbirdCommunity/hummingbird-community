@@ -18,7 +18,7 @@ import { createProject, validateLogo } from '@/lib/projects';
 
 const NAME_MAX = 80;
 const TAGLINE_MAX = 120;
-const MANIFESTO_MAX = 500;
+const MANIFESTO_MAX = 2000;
 
 export function CreateProjectPanel(): ReactElement | null {
 	const t = useTranslations('project');
