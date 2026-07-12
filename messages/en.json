@@ -7,6 +7,7 @@
 		"switchLanguage": "Switch language"
 	},
 	"nav": {
+		"primary": "Primary",
 		"myProfile": "My Profile",
 		"explore": "Explore",
 		"myProject": "My Project"

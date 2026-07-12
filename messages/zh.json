@@ -7,6 +7,7 @@
 		"switchLanguage": "切换语言"
 	},
 	"nav": {
+		"primary": "主导航",
 		"myProfile": "我的主页",
 		"explore": "探索",
 		"myProject": "我的项目"
