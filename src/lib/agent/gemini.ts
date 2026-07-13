@@ -24,9 +24,9 @@ export async function generateStructuredOutput<T>(opts: {
 	const ai = getGeminiClient();
 	const response = await ai.models.generateContent({
 		model: opts.model ?? 'gemini-3.5-flash',
-		systemInstruction: opts.systemPrompt,
 		contents: opts.userPrompt,
 		config: {
+			systemInstruction: opts.systemPrompt,
 			responseMimeType: 'application/json',
 			responseSchema: opts.schema,
 		},
