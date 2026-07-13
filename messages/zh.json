@@ -10,12 +10,14 @@
 		"primary": "主导航",
 		"myProfile": "我的主页",
 		"explore": "探索",
-		"myProject": "我的项目"
+		"myProject": "我的项目",
+		"investigate": "调研"
 	},
 	"pages": {
 		"comingSoon": "即将上线",
 		"exploreSubtitle": "发现社区里的人、项目和机会。",
-		"myProjectSubtitle": "在这里跟踪和管理你参与的项目。"
+		"myProjectSubtitle": "在这里跟踪和管理你参与的项目。",
+		"investigateSubtitle": "调研一位 GitHub 开发者的技能和职业历程。"
 	},
 	"home": {
 		"tagline": "一个让远程工作者连接、分享、共同成长的地方。",
@@ -143,6 +145,29 @@
 			"forks": "{count} 个 fork",
 			"lastUpdated": "更新于 {date}",
 			"paused": "已暂停更新——GitHub 已断开"
+		}
+	},
+	"investigate": {
+		"title": "调研",
+		"subtitle": "输入 GitHub 用户名，调研其开发者画像。",
+		"usernamePlaceholder": "例如 octocat",
+		"submit": "开始调研",
+		"submitting": "启动中…",
+		"recentTitle": "最近的调研",
+		"empty": "还没有调研记录，试试上面的输入框。",
+		"errorGeneric": "启动调研失败，请重试。",
+		"errorNotFound": "未找到该 GitHub 用户。",
+		"progress": {
+			"title": "调研进行中",
+			"profile": "收集用户资料…",
+			"repos": "分析仓库…",
+			"contributions": "分析贡献…",
+			"cross-repo": "扫描跨仓库活动…",
+			"synthesis": "AI 综合分析…",
+			"saving": "保存结果…",
+			"complete": "调研完成！",
+			"failed": "调研失败。",
+			"retry": "重试"
 		}
 	},
 	"impersonation": {

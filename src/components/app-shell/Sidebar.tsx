@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { Compass, FolderKanban, User } from 'lucide-react';
+import { Compass, FolderKanban, Search, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link, usePathname } from '@/i18n/navigation';
@@ -14,6 +14,7 @@ const navItems = [
 	{ href: '/profile', labelKey: 'myProfile', Icon: User },
 	{ href: '/explore', labelKey: 'explore', Icon: Compass },
 	{ href: '/my-project', labelKey: 'myProject', Icon: FolderKanban },
+	{ href: '/investigate', labelKey: 'investigate', Icon: Search },
 ] as const;
 
 export function Sidebar(): ReactElement {

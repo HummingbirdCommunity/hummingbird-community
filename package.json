@@ -31,6 +31,8 @@
     "react-dom": "19.2.7",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
+    "workflow": "latest",
+    "@google/genai": "^2.11.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
