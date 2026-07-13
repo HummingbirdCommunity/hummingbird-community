@@ -42,3 +42,4 @@ next-env.d.ts
 
 # stepgate (local config, kept off the shared repo)
 /.stepgate/
+/.swc

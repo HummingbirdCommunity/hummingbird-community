@@ -10,12 +10,14 @@
 		"primary": "Primary",
 		"myProfile": "My Profile",
 		"explore": "Explore",
-		"myProject": "My Project"
+		"myProject": "My Project",
+		"investigate": "Investigate"
 	},
 	"pages": {
 		"comingSoon": "Coming soon",
 		"exploreSubtitle": "Discover people, projects, and opportunities across the community.",
-		"myProjectSubtitle": "Track and manage the projects you're part of."
+		"myProjectSubtitle": "Track and manage the projects you're part of.",
+		"investigateSubtitle": "Research a GitHub developer's skills and career history."
 	},
 	"home": {
 		"tagline": "A place for remote workers to connect, share, and grow together.",
@@ -143,6 +145,29 @@
 			"forks": "{count, plural, one {# fork} other {# forks}}",
 			"lastUpdated": "Updated {date}",
 			"paused": "Updates paused — GitHub disconnected"
+		}
+	},
+	"investigate": {
+		"title": "Investigate",
+		"subtitle": "Enter a GitHub username to research their developer profile.",
+		"usernamePlaceholder": "e.g. octocat",
+		"submit": "Investigate",
+		"submitting": "Starting…",
+		"recentTitle": "Recent investigations",
+		"empty": "No investigations yet. Try one above.",
+		"errorGeneric": "Couldn't start investigation. Please try again.",
+		"errorNotFound": "GitHub user not found.",
+		"progress": {
+			"title": "Investigation in progress",
+			"profile": "Collecting profile…",
+			"repos": "Analyzing repositories…",
+			"contributions": "Analyzing contributions…",
+			"cross-repo": "Scanning cross-repo activity…",
+			"synthesis": "AI synthesis…",
+			"saving": "Saving results…",
+			"complete": "Investigation complete!",
+			"failed": "Investigation failed.",
+			"retry": "Retry"
 		}
 	},
 	"impersonation": {
