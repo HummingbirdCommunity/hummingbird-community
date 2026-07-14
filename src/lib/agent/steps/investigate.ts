@@ -9,7 +9,7 @@ import { aggregateSignatureRepos } from '@/lib/github/signature';
 import { getUserGitHubToken } from '@/lib/github/token';
 import { supabase } from '@/lib/supabase/server';
 
-import type { InvestigationProgress } from '../types';
+import type { DeveloperSummary, InvestigationProgress, ProfileSource, ProfileVisibility, Provenance } from '../types';
 import { fetchContributions } from '../contributions';
 import { llmChatWithProvider } from '../llm';
 import { SUMMARY_JSON_SCHEMA, SYSTEM_PROMPT } from '../prompts';
@@ -242,29 +242,78 @@ export async function executeToolCall(name: string, args: Record<string, string>
 	}
 }
 
-/** Persist the outcome of an investigation to its `github_investigations` row.
- *  Keyed by the DB row id (stable, known before the workflow starts) rather than
- *  the workflow run id, so the update never depends on the run id being written
- *  back first. A write failure is logged but not thrown — the workflow's own
- *  return value is still the source of truth for the immediate response. */
-export async function saveInvestigationResult(
-	investigationId: string,
-	patch: { status: 'completed'; profileData: unknown } | { status: 'failed'; errorMessage: string }
+/** Upsert the subject's canonical developer profile from a completed run.
+ *  Keyed by (github_login, source): an observed regeneration only ever touches
+ *  the observed row, so it can never overwrite an authored profile. Timestamps
+ *  are stamped here (in the step) rather than by the workflow orchestrator,
+ *  which replays and would drift on `Date`. `freshnessDays` = null means no
+ *  expiry (authored); `setPurge` marks a non-member observed profile for the
+ *  scheduled hard delete (HB-28). Returns the profile id so the run can point
+ *  at it. Throws on failure — the caller records the run as failed rather than
+ *  leaving a half-written profile. */
+export async function upsertDeveloperProfile(input: {
+	githubLogin: string;
+	source: ProfileSource;
+	visibility?: ProfileVisibility;
+	subjectUserId?: string | null;
+	summary: DeveloperSummary;
+	provenance: Provenance;
+	freshnessDays: number | null;
+	setPurge: boolean;
+}): Promise<string> {
+	'use step';
+
+	const now = new Date();
+	const expiresAt =
+		input.freshnessDays != null
+			? new Date(now.getTime() + input.freshnessDays * 24 * 60 * 60 * 1000).toISOString()
+			: null;
+
+	const { data, error } = await supabase
+		.from('developer_profiles')
+		.upsert(
+			{
+				github_login: input.githubLogin,
+				source: input.source,
+				visibility: input.visibility ?? 'private',
+				subject_user_id: input.subjectUserId ?? null,
+				summary: input.summary,
+				provenance: input.provenance,
+				generated_at: now.toISOString(),
+				fresh_until: expiresAt,
+				purge_after: input.setPurge ? expiresAt : null,
+			},
+			{ onConflict: 'github_login,source' }
+		)
+		.select('id')
+		.single();
+
+	if (error || !data) {
+		throw new Error(`Failed to upsert developer profile: ${error?.message ?? 'no row returned'}`);
+	}
+	return data.id as string;
+}
+
+/** Record the terminal state of an investigation run, keyed by the run row id
+ *  (stable, known before the workflow starts). A write failure is logged but not
+ *  thrown — this row is an audit trail; the workflow's own return value is still
+ *  the source of truth for the immediate response. */
+export async function saveRunResult(
+	runId: string,
+	patch: { status: 'completed'; profileId: string } | { status: 'failed'; errorMessage: string }
 ) {
 	'use step';
 
 	const { error } = await supabase
-		.from('github_investigations')
+		.from('investigation_runs')
 		.update({
 			status: patch.status,
 			completed_at: new Date().toISOString(),
-			...(patch.status === 'completed'
-				? { profile_data: patch.profileData }
-				: { error_message: patch.errorMessage }),
+			...(patch.status === 'completed' ? { profile_id: patch.profileId } : { error_message: patch.errorMessage }),
 		})
-		.eq('id', investigationId);
+		.eq('id', runId);
 
 	if (error) {
-		console.error('[agent] failed to save investigation result:', error);
+		console.error('[agent] failed to save run result:', error);
 	}
 }

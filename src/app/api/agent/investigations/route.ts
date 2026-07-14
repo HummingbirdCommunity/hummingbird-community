@@ -1,5 +1,5 @@
-// GET /api/agent/investigations — the caller's recent investigations, newest
-// first, for the "Recent investigations" list on the Investigate page.
+// GET /api/agent/investigations — the caller's recent investigation runs,
+// newest first, for the "Recent investigations" list on the Investigate page.
 
 import { getUserFromRequest } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
@@ -22,10 +22,10 @@ export async function GET(request: Request) {
 	}
 
 	const { data, error } = await supabase
-		.from('github_investigations')
-		.select('workflow_run_id, target_username, status, created_at')
+		.from('investigation_runs')
+		.select('workflow_run_id, target_login, status, started_at')
 		.eq('requested_by', user.id)
-		.order('created_at', { ascending: false })
+		.order('started_at', { ascending: false })
 		.limit(LIMIT);
 
 	if (error) {
@@ -34,9 +34,9 @@ export async function GET(request: Request) {
 
 	const items: InvestigationListItem[] = (data ?? []).map((row) => ({
 		runId: row.workflow_run_id,
-		targetUsername: row.target_username,
+		targetUsername: row.target_login,
 		status: row.status,
-		createdAt: row.created_at,
+		createdAt: row.started_at,
 	}));
 
 	return Response.json({ items });

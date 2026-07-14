@@ -55,63 +55,63 @@ export const developerSummarySchema = z.object({
 /** The synthesized, evidence-backed developer summary (Phase 2 rich schema). */
 export type DeveloperSummary = z.infer<typeof developerSummarySchema>;
 
-/** Raw profile data collected from GitHub's GraphQL API (Phase 1). */
-export interface RawProfile {
-	username: string;
-	name: string | null;
-	bio: string | null;
-	company: string | null;
-	location: string | null;
-	email: string | null;
-	isHireable: boolean;
-	website: string | null;
-	twitter: string | null;
-	createdAt: string;
-	socialAccounts: Array<{ provider: string; url: string }>;
-	followersCount: number;
-	followingCount: number;
-	organizations: Array<{ login: string; name: string | null }>;
-	pinnedItems: Array<{
-		nameWithOwner: string;
-		description: string | null;
-		stargazerCount: number;
-		primaryLanguage: { name: string } | null;
-	}>;
-	publicReposCount: number;
-	contributionYears: number[];
-	badges: string[];
-}
+/** How a profile's data was sourced (HB-26). Orthogonal to visibility. */
+export type ProfileSource = 'authored' | 'observed';
 
-/** Final synthesized developer profile output from the AI step (Phase 5). */
-export interface DeveloperProfile {
-	identity: {
-		github_username: string;
-		display_name: string | null;
-		bio: string | null;
-		location: string | null;
-		member_since: string;
-		organizations: string[];
-	};
-	technical_skills: {
-		primary_languages: Array<{ name: string; proficiency: string }>;
-		frameworks_and_tools: string[];
-		domains: string[];
-	};
-	ai_summary: {
-		headline: string;
-		strengths: string[];
-		career_trajectory: string;
-		collaboration_style: string;
-	};
-	activity_metrics: {
-		total_public_repos: number;
-		total_stars_received: number;
-		contribution_streak_years: number;
-		notable_contributions: string[];
-	};
-	confidence_score: number;
-	generated_at: string;
-}
+/** Who may read a profile (HB-26). */
+export type ProfileVisibility = 'private' | 'public';
 
 /** Status of an investigation run. */
-export type InvestigationStatus = 'pending' | 'running' | 'completed' | 'failed';
+export type InvestigationRunStatus = 'running' | 'completed' | 'failed';
+
+/** The subject's public identity shown on the result card. Lives in
+ *  `provenance` so `summary` stays purely analytical. */
+export interface ProfileIdentity {
+	name: string | null;
+	bio: string | null;
+	location: string | null;
+	followers: number;
+	publicRepos: number;
+	avatarUrl: string;
+	url: string;
+}
+
+/** Non-summary record of how a profile was produced — the audit substrate the
+ *  result route reconstructs its response from. `evidence_snapshot` (HB-27) is
+ *  separate; this holds identity, the tool-call log, and generation metadata. */
+export interface Provenance {
+	profile: ProfileIdentity | null;
+	tool_calls: Array<{ tool: string; args: Record<string, string> }>;
+	data_sources?: Record<string, number>;
+	agent_model?: string;
+}
+
+/** A row in `developer_profiles` (HB-26). */
+export interface DeveloperProfileRow {
+	id: string;
+	github_login: string;
+	subject_user_id: string | null;
+	source: ProfileSource;
+	visibility: ProfileVisibility;
+	summary: DeveloperSummary | null;
+	evidence_snapshot: unknown;
+	provenance: Provenance | null;
+	generated_at: string | null;
+	fresh_until: string | null;
+	purge_after: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+/** A row in `investigation_runs` (HB-26). */
+export interface InvestigationRun {
+	id: string;
+	profile_id: string | null;
+	requested_by: string;
+	workflow_run_id: string | null;
+	target_login: string;
+	status: InvestigationRunStatus;
+	started_at: string;
+	completed_at: string | null;
+	error_message: string | null;
+}
