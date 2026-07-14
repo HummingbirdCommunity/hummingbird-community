@@ -1,9 +1,13 @@
 // TypeScript types for the GitHub investigation agent.
 
-/** Progress update emitted to the streaming client during an investigation. */
+/** Progress update emitted to the streaming client during an investigation.
+ *  `key` is an i18n message key; `params` are interpolation values.
+ *  The frontend resolves them via next-intl. */
 export interface InvestigationProgress {
 	phase: 'profile' | 'repos' | 'contributions' | 'cross-repo' | 'synthesis' | 'saving';
-	message: string;
+	key: string;
+	params?: Record<string, string | number>;
+	status?: 'warning';
 }
 
 /** Raw profile data collected from GitHub's GraphQL API (Phase 1). */
