@@ -168,7 +168,17 @@
 			"providerUnavailable": "{model} via {vendor} is unavailable ({status})",
 			"lookingUpProfile": "Looking up {username} on GitHub...",
 			"fetchingRepos": "Fetching repos for {username}...",
-			"wrappingUp": "Wrapping up..."
+			"fetchingSignature": "Reading {username}'s signature repos...",
+			"analyzingContributions": "Analyzing {username}'s contributions...",
+			"searchingContributions": "Searching {username}'s external contributions...",
+			"synthesizing": "Synthesizing summary with {model} via {vendor}...",
+			"wrappingUp": "Wrapping up...",
+			"strengths": "Strengths",
+			"languages": "Languages",
+			"domains": "Domains",
+			"notableRepos": "Notable repositories",
+			"externalContributions": "External contributions",
+			"dataQuality": "Data quality"
 		}
 	},
 	"impersonation": {

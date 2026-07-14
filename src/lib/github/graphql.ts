@@ -22,7 +22,7 @@ export interface GraphQLResult<T = Record<string, unknown>> {
 export async function queryGitHubGraphQL<T = Record<string, unknown>>(
 	query: string,
 	variables: Record<string, unknown>,
-	token: string,
+	token: string
 ): Promise<GraphQLResult<T>> {
 	const response = await fetch(GITHUB_GRAPHQL_URL, {
 		method: 'POST',

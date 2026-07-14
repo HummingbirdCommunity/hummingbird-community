@@ -5,7 +5,7 @@ import { AlertTriangle, BookOpen, CheckCircle, Loader2, MapPin, Users } from 'lu
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
-import type { InvestigationProgress as ProgressUpdate } from '@/lib/agent/types';
+import type { DeveloperSummary, InvestigationProgress as ProgressUpdate } from '@/lib/agent/types';
 
 import { supabase } from '@/lib/supabase/client';
 
@@ -26,13 +26,7 @@ interface InvestigationResult {
 		avatarUrl: string;
 		url: string;
 	};
-	summary?: {
-		headline: string;
-		strengths: string[];
-		primary_languages: string[];
-		notable_repos: string[];
-		career_stage: string;
-	};
+	summary?: DeveloperSummary;
 }
 
 export function InvestigationProgress({ runId }: Props): ReactElement {
@@ -216,23 +210,17 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 					</div>
 
 					{/* AI Summary */}
-					<div className="bg-muted rounded-lg p-4 space-y-3">
-						<p className="text-sm font-medium">{result.summary.headline}</p>
-
-						<div className="flex flex-wrap gap-1.5">
-							<span className="bg-background rounded px-2 py-0.5 text-xs font-medium">
+					<div className="bg-muted rounded-lg p-4 space-y-4">
+						<div className="flex flex-wrap items-center gap-2">
+							<span className="bg-background rounded px-2 py-0.5 text-xs font-medium capitalize">
 								{result.summary.career_stage}
 							</span>
-							{result.summary.primary_languages.map((lang) => (
-								<span key={lang} className="bg-primary/10 text-primary rounded px-2 py-0.5 text-xs">
-									{lang}
-								</span>
-							))}
+							<p className="text-sm font-medium">{result.summary.headline}</p>
 						</div>
 
 						{result.summary.strengths.length > 0 && (
 							<div>
-								<p className="text-muted-foreground mb-1 text-xs font-medium">Strengths</p>
+								<p className="text-muted-foreground mb-1 text-xs font-medium">{t('strengths')}</p>
 								<ul className="text-muted-foreground list-inside list-disc text-xs space-y-0.5">
 									{result.summary.strengths.map((s) => (
 										<li key={s}>{s}</li>
@@ -241,16 +229,96 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 							</div>
 						)}
 
-						{result.summary.notable_repos.length > 0 && (
+						{result.summary.languages.length > 0 && (
 							<div>
-								<p className="text-muted-foreground mb-1 text-xs font-medium">Notable repos</p>
+								<p className="text-muted-foreground mb-1.5 text-xs font-medium">{t('languages')}</p>
+								<div className="space-y-1.5">
+									{result.summary.languages.map((lang) => (
+										<div key={lang.name} className="flex items-baseline gap-2 text-xs">
+											<span className="bg-primary/10 text-primary shrink-0 rounded px-2 py-0.5 font-medium">
+												{lang.name}
+											</span>
+											<span className="text-foreground shrink-0 capitalize">
+												{lang.proficiency}
+											</span>
+											<span className="text-muted-foreground">— {lang.evidence}</span>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+
+						{result.summary.domains.length > 0 && (
+							<div>
+								<p className="text-muted-foreground mb-1.5 text-xs font-medium">{t('domains')}</p>
 								<div className="flex flex-wrap gap-1.5">
-									{result.summary.notable_repos.map((repo) => (
-										<span key={repo} className="bg-background rounded px-2 py-0.5 text-xs">
-											{repo}
+									{result.summary.domains.map((d) => (
+										<span
+											key={d.name}
+											title={d.evidence}
+											className="bg-background rounded px-2 py-0.5 text-xs"
+										>
+											{d.name} · <span className="text-muted-foreground">{d.depth}</span>
 										</span>
 									))}
 								</div>
+							</div>
+						)}
+
+						{result.summary.notable_repos.length > 0 && (
+							<div>
+								<p className="text-muted-foreground mb-1.5 text-xs font-medium">{t('notableRepos')}</p>
+								<ul className="space-y-1">
+									{result.summary.notable_repos.map((repo) => (
+										<li key={repo.name_with_owner} className="text-xs">
+											<a
+												href={repo.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-primary font-medium hover:underline"
+											>
+												{repo.name_with_owner}
+											</a>{' '}
+											<span className="text-muted-foreground">
+												★{repo.stars} · {repo.role} — {repo.reason}
+											</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+
+						{result.summary.external_contributions.length > 0 && (
+							<div>
+								<p className="text-muted-foreground mb-1.5 text-xs font-medium">
+									{t('externalContributions')}
+								</p>
+								<ul className="space-y-1">
+									{result.summary.external_contributions.map((c) => (
+										<li key={c.url} className="text-xs">
+											<a
+												href={c.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-primary font-medium hover:underline"
+											>
+												{c.repo}
+											</a>{' '}
+											<span className="text-muted-foreground">— {c.description}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+
+						{result.summary.data_quality_notes.length > 0 && (
+							<div className="border-t pt-3">
+								<p className="text-muted-foreground mb-1 text-xs font-medium">{t('dataQuality')}</p>
+								<ul className="text-muted-foreground list-inside list-disc text-xs space-y-0.5">
+									{result.summary.data_quality_notes.map((n) => (
+										<li key={n}>{n}</li>
+									))}
+								</ul>
 							</div>
 						)}
 					</div>
