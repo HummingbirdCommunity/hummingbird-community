@@ -5,21 +5,24 @@ import type { ChatCompletionMessageParam, ChatCompletionTool } from 'openai/reso
 import { getWritable } from 'workflow';
 
 import { REQUEST_TIMEOUT_MS, USER_AGENT } from '@/lib/github/http';
+import { aggregateSignatureRepos } from '@/lib/github/signature';
 import { getUserGitHubToken } from '@/lib/github/token';
 import { supabase } from '@/lib/supabase/server';
 
 import type { InvestigationProgress } from '../types';
+import { fetchContributions } from '../contributions';
 import { llmChatWithProvider } from '../llm';
+import { SUMMARY_JSON_SCHEMA, SYSTEM_PROMPT } from '../prompts';
 
-export interface DeveloperSummary {
-	headline: string;
-	strengths: string[];
-	primary_languages: string[];
-	notable_repos: string[];
-	career_stage: string;
-}
+export { SYSTEM_PROMPT };
 
 // -- Tool definitions (OpenAI function calling format) --
+
+const usernameParam = {
+	type: 'object' as const,
+	properties: { username: { type: 'string', description: 'GitHub username' } },
+	required: ['username'],
+};
 
 export const TOOLS: ChatCompletionTool[] = [
 	{
@@ -27,14 +30,8 @@ export const TOOLS: ChatCompletionTool[] = [
 		function: {
 			name: 'get_github_profile',
 			description:
-				"Get a GitHub user's public profile including name, bio, company, location, follower count, public repo count, and account creation date.",
-			parameters: {
-				type: 'object',
-				properties: {
-					username: { type: 'string', description: 'GitHub username' },
-				},
-				required: ['username'],
-			},
+				"Get a GitHub user's public profile: name, bio, company, location, follower count, public repo count, and account creation date.",
+			parameters: usernameParam,
 		},
 	},
 	{
@@ -43,32 +40,37 @@ export const TOOLS: ChatCompletionTool[] = [
 			name: 'get_top_repos',
 			description:
 				"Get a GitHub user's top public repositories sorted by stars (up to 10). Returns repo name, description, primary language, star count, fork count, and topics.",
-			parameters: {
-				type: 'object',
-				properties: {
-					username: { type: 'string', description: 'GitHub username' },
-				},
-				required: ['username'],
-			},
+			parameters: usernameParam,
+		},
+	},
+	{
+		type: 'function',
+		function: {
+			name: 'get_signature_repos',
+			description:
+				"Get a user's signature repositories — the repos they pinned plus their top-starred owned repos — with stars, forks, primary language, and whether each is a fork. Good for what the developer wants to be known for.",
+			parameters: usernameParam,
+		},
+	},
+	{
+		type: 'function',
+		function: {
+			name: 'get_contributions',
+			description:
+				"Get a user's contribution activity: total commits/PRs/issues/reviews, active years, and — most importantly — languages ranked by the user's OWN commit participation (not repo size), plus the repos they committed to most. Use this to judge real language proficiency.",
+			parameters: usernameParam,
+		},
+	},
+	{
+		type: 'function',
+		function: {
+			name: 'search_cross_repo_prs',
+			description:
+				'Find pull requests the user opened in repositories they do NOT own (external / open-source contributions). Returns repo, PR title, URL, and state.',
+			parameters: usernameParam,
 		},
 	},
 ];
-
-export const SYSTEM_PROMPT = `You are a developer research agent. Given a GitHub username, use the available tools to investigate the developer, then produce a JSON summary.
-
-Instructions:
-1. First call get_github_profile to get the user's profile
-2. Then call get_top_repos to see their repositories
-3. Based on the data, produce your final response as a JSON object with this structure:
-{
-  "headline": "A one-sentence summary of this developer",
-  "strengths": ["strength1", "strength2", "strength3"],
-  "primary_languages": ["lang1", "lang2"],
-  "notable_repos": ["repo1", "repo2"],
-  "career_stage": "junior | mid-level | senior | staff | distinguished"
-}
-
-Always call the tools first before producing your summary. Respond with ONLY the JSON object as your final answer (no markdown fences).`;
 
 // -- Steps --
 
@@ -89,7 +91,8 @@ export async function emitProgress(
 	}
 }
 
-/** Call a specific provider. Returns the choice. Throws ProviderUnavailableError on rate limit. */
+/** Call a provider for the gathering loop (tools enabled). Returns the choice.
+ *  Throws ProviderUnavailableError on rate limit so the workflow tries the next. */
 export async function callProvider(providerName: string, messages: ChatCompletionMessageParam[]) {
 	'use step';
 
@@ -103,12 +106,30 @@ export async function callProvider(providerName: string, messages: ChatCompletio
 	return { choice, provider, model };
 }
 
+/** Call a provider for synthesis: no tools, JSON-schema response format. Returns
+ *  the raw JSON string content (the workflow parses + validates it). */
+export async function callProviderStructured(providerName: string, messages: ChatCompletionMessageParam[]) {
+	'use step';
+
+	const { response } = await llmChatWithProvider(providerName, {
+		messages,
+		responseFormat: {
+			type: 'json_schema',
+			json_schema: { name: 'developer_summary', strict: true, schema: SUMMARY_JSON_SCHEMA },
+		},
+	});
+	const content = response.choices[0]?.message?.content;
+	if (!content) throw new Error('No content from LLM synthesis');
+	return { content };
+}
+
 /** Execute a single tool call against the GitHub API.
  *  `requesterId` is the user who started the investigation; their connected
  *  OAuth token authenticates the call (5,000 req/hr). We resolve and decrypt it
  *  here — inside the step — so the plaintext token never lands in durable
  *  workflow state. Falls back to anonymous (60 req/hr) when they haven't
- *  connected GitHub. */
+ *  connected GitHub; GraphQL-backed tools require a token and return an error
+ *  in that case. */
 export async function executeToolCall(name: string, args: Record<string, string>, requesterId: string) {
 	'use step';
 
@@ -121,10 +142,11 @@ export async function executeToolCall(name: string, args: Record<string, string>
 		Accept: 'application/vnd.github+json',
 		...(token ? { Authorization: `Bearer ${token}` } : {}),
 	};
+	const username = args.username;
 
 	switch (name) {
 		case 'get_github_profile': {
-			const res = await fetch(`https://api.github.com/users/${encodeURIComponent(args.username)}`, {
+			const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
 				headers,
 				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 			});
@@ -148,11 +170,8 @@ export async function executeToolCall(name: string, args: Record<string, string>
 		}
 		case 'get_top_repos': {
 			const res = await fetch(
-				`https://api.github.com/users/${encodeURIComponent(args.username)}/repos?sort=stars&per_page=10&type=owner`,
-				{
-					headers,
-					signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-				}
+				`https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=stars&per_page=10&type=owner`,
+				{ headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) }
 			);
 			if (!res.ok) return JSON.stringify({ error: `GitHub API error: ${res.status}` });
 			const repos = await res.json();
@@ -166,6 +185,57 @@ export async function executeToolCall(name: string, args: Record<string, string>
 					topics: r.topics,
 				}))
 			);
+		}
+		case 'get_signature_repos': {
+			if (!token)
+				return JSON.stringify({
+					error: 'Requires the requester to have connected GitHub (GraphQL needs a token).',
+				});
+			try {
+				const { repos } = await aggregateSignatureRepos(token, username);
+				return JSON.stringify(repos);
+			} catch (err) {
+				return JSON.stringify({ error: err instanceof Error ? err.message : 'signature lookup failed' });
+			}
+		}
+		case 'get_contributions': {
+			if (!token)
+				return JSON.stringify({
+					error: 'Requires the requester to have connected GitHub (GraphQL needs a token).',
+				});
+			try {
+				const summary = await fetchContributions(token, username);
+				return JSON.stringify(summary);
+			} catch (err) {
+				return JSON.stringify({ error: err instanceof Error ? err.message : 'contributions lookup failed' });
+			}
+		}
+		case 'search_cross_repo_prs': {
+			const q = `author:${username} type:pr`;
+			const res = await fetch(
+				`https://api.github.com/search/issues?q=${encodeURIComponent(q)}&per_page=20&sort=interactions&order=desc`,
+				{ headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) }
+			);
+			if (!res.ok) return JSON.stringify({ error: `GitHub API error: ${res.status}` });
+			const data = (await res.json()) as { items?: Array<Record<string, unknown>> };
+			const external = (data.items ?? [])
+				.map((item) => {
+					// repository_url is https://api.github.com/repos/{owner}/{repo}
+					const repoPath = String(item.repository_url ?? '').replace('https://api.github.com/repos/', '');
+					const owner = repoPath.split('/')[0] ?? '';
+					return {
+						repo: repoPath,
+						owner,
+						title: item.title as string,
+						url: item.html_url as string,
+						state: item.state as string,
+					};
+				})
+				// Only PRs to repos the user does NOT own.
+				.filter((pr) => pr.owner.toLowerCase() !== username.toLowerCase())
+				.slice(0, 10)
+				.map(({ repo, title, url, state }) => ({ repo, title, url, state }));
+			return JSON.stringify(external);
 		}
 		default:
 			return JSON.stringify({ error: `Unknown tool: ${name}` });

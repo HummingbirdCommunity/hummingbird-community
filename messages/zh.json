@@ -168,7 +168,17 @@
 			"providerUnavailable": "{vendor} 的 {model} 不可用（{status}）",
 			"lookingUpProfile": "正在查找 {username} 的 GitHub 资料…",
 			"fetchingRepos": "正在获取 {username} 的仓库…",
-			"wrappingUp": "整理结果…"
+			"fetchingSignature": "正在读取 {username} 的代表性仓库…",
+			"analyzingContributions": "正在分析 {username} 的贡献记录…",
+			"searchingContributions": "正在搜索 {username} 的外部贡献…",
+			"synthesizing": "正在用 {vendor} 的 {model} 生成总结…",
+			"wrappingUp": "整理结果…",
+			"strengths": "优势",
+			"languages": "编程语言",
+			"domains": "技术领域",
+			"notableRepos": "代表作品",
+			"externalContributions": "外部贡献",
+			"dataQuality": "数据质量说明"
 		}
 	},
 	"impersonation": {
