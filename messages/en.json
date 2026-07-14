@@ -159,15 +159,16 @@
 		"errorNotFound": "GitHub user not found.",
 		"progress": {
 			"title": "Investigation in progress",
-			"profile": "Collecting profile…",
-			"repos": "Analyzing repositories…",
-			"contributions": "Analyzing contributions…",
-			"cross-repo": "Scanning cross-repo activity…",
-			"synthesis": "AI synthesis…",
-			"saving": "Saving results…",
 			"complete": "Investigation complete!",
 			"failed": "Investigation failed.",
-			"retry": "Retry"
+			"retry": "Retry",
+			"connecting": "Connecting...",
+			"asking": "Asking {model} via {vendor}...",
+			"switching": "Switching to {model} via {vendor}...",
+			"providerUnavailable": "{model} via {vendor} is unavailable ({status})",
+			"lookingUpProfile": "Looking up {username} on GitHub...",
+			"fetchingRepos": "Fetching repos for {username}...",
+			"wrappingUp": "Wrapping up..."
 		}
 	},
 	"impersonation": {

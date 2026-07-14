@@ -159,15 +159,16 @@
 		"errorNotFound": "未找到该 GitHub 用户。",
 		"progress": {
 			"title": "调研进行中",
-			"profile": "收集用户资料…",
-			"repos": "分析仓库…",
-			"contributions": "分析贡献…",
-			"cross-repo": "扫描跨仓库活动…",
-			"synthesis": "AI 综合分析…",
-			"saving": "保存结果…",
 			"complete": "调研完成！",
 			"failed": "调研失败。",
-			"retry": "重试"
+			"retry": "重试",
+			"connecting": "连接中…",
+			"asking": "正在请求 {vendor} 的 {model}…",
+			"switching": "切换到 {vendor} 的 {model}…",
+			"providerUnavailable": "{vendor} 的 {model} 不可用（{status}）",
+			"lookingUpProfile": "正在查找 {username} 的 GitHub 资料…",
+			"fetchingRepos": "正在获取 {username} 的仓库…",
+			"wrappingUp": "整理结果…"
 		}
 	},
 	"impersonation": {
