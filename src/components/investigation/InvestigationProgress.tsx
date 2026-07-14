@@ -1,11 +1,13 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle, Loader2, MapPin, Users, BookOpen } from 'lucide-react';
+import { AlertTriangle, BookOpen, CheckCircle, Loader2, MapPin, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
 import type { InvestigationProgress as ProgressUpdate } from '@/lib/agent/types';
+
+import { supabase } from '@/lib/supabase/client';
 
 interface Props {
 	runId: string;
@@ -35,7 +37,9 @@ interface InvestigationResult {
 
 export function InvestigationProgress({ runId }: Props): ReactElement {
 	const t = useTranslations('investigate.progress');
-	const [steps, setSteps] = useState<Array<{ key: string; params?: Record<string, string | number>; status?: 'warning' }>>([]);
+	const [steps, setSteps] = useState<
+		Array<{ key: string; params?: Record<string, string | number>; status?: 'warning' }>
+	>([]);
 	const [result, setResult] = useState<InvestigationResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [streamDone, setStreamDone] = useState(false);
@@ -74,7 +78,10 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 						try {
 							const parsed = JSON.parse(jsonStr) as ProgressUpdate;
 							if (parsed.phase && parsed.key) {
-								setSteps((prev) => [...prev, { key: parsed.key, params: parsed.params, status: parsed.status }]);
+								setSteps((prev) => [
+									...prev,
+									{ key: parsed.key, params: parsed.params, status: parsed.status },
+								]);
 							}
 						} catch {
 							// skip
@@ -99,7 +106,14 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 
 		async function fetchResult() {
 			try {
-				const res = await fetch(`/api/agent/result?runId=${runId}`);
+				const {
+					data: { session },
+				} = await supabase.auth.getSession();
+				if (!session) return;
+
+				const res = await fetch(`/api/agent/result?runId=${runId}`, {
+					headers: { Authorization: `Bearer ${session.access_token}` },
+				});
 				if (res.ok) {
 					setResult(await res.json());
 				}
@@ -170,14 +184,15 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 					{/* Profile header */}
 					<div className="flex items-start gap-4">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src={result.profile.avatarUrl}
-							alt={result.username}
-							className="size-16 rounded-full"
-						/>
+						<img src={result.profile.avatarUrl} alt={result.username} className="size-16 rounded-full" />
 						<div className="space-y-1">
 							<h3 className="text-lg font-semibold">
-								<a href={result.profile.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+								<a
+									href={result.profile.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="hover:underline"
+								>
 									{result.profile.name ?? result.username}
 								</a>
 							</h3>
@@ -239,7 +254,6 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 							</div>
 						)}
 					</div>
-
 				</div>
 			)}
 

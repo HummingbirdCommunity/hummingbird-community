@@ -1,12 +1,15 @@
 // Agent steps — each step is a durable, retryable unit of work.
 // The workflow orchestrates the loop; these steps handle individual turns.
 
-import { getWritable } from 'workflow';
 import type { ChatCompletionMessageParam, ChatCompletionTool } from 'openai/resources/chat/completions';
+import { getWritable } from 'workflow';
+
+import { REQUEST_TIMEOUT_MS, USER_AGENT } from '@/lib/github/http';
+import { getUserGitHubToken } from '@/lib/github/token';
+import { supabase } from '@/lib/supabase/server';
 
 import type { InvestigationProgress } from '../types';
 import { llmChatWithProvider } from '../llm';
-import { USER_AGENT, REQUEST_TIMEOUT_MS } from '@/lib/github/http';
 
 export interface DeveloperSummary {
 	headline: string;
@@ -75,7 +78,7 @@ export async function emitProgress(
 	phase: InvestigationProgress['phase'],
 	key: string,
 	params?: Record<string, string | number>,
-	status?: InvestigationProgress['status'],
+	status?: InvestigationProgress['status']
 ) {
 	'use step';
 	const writer = getWritable<InvestigationProgress>().getWriter();
@@ -100,19 +103,31 @@ export async function callProvider(providerName: string, messages: ChatCompletio
 	return { choice, provider, model };
 }
 
-/** Execute a single tool call against the GitHub API. */
-export async function executeToolCall(name: string, args: Record<string, string>) {
+/** Execute a single tool call against the GitHub API.
+ *  `requesterId` is the user who started the investigation; their connected
+ *  OAuth token authenticates the call (5,000 req/hr). We resolve and decrypt it
+ *  here — inside the step — so the plaintext token never lands in durable
+ *  workflow state. Falls back to anonymous (60 req/hr) when they haven't
+ *  connected GitHub. */
+export async function executeToolCall(name: string, args: Record<string, string>, requesterId: string) {
 	'use step';
+
+	const token = await getUserGitHubToken(requesterId);
+	if (!token) {
+		console.warn('[agent] no GitHub token for requester; using anonymous GitHub API (60 req/hr)');
+	}
+	const headers: Record<string, string> = {
+		'User-Agent': USER_AGENT,
+		Accept: 'application/vnd.github+json',
+		...(token ? { Authorization: `Bearer ${token}` } : {}),
+	};
 
 	switch (name) {
 		case 'get_github_profile': {
-			const res = await fetch(
-				`https://api.github.com/users/${encodeURIComponent(args.username)}`,
-				{
-					headers: { 'User-Agent': USER_AGENT, Accept: 'application/vnd.github+json' },
-					signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-				},
-			);
+			const res = await fetch(`https://api.github.com/users/${encodeURIComponent(args.username)}`, {
+				headers,
+				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+			});
 			if (res.status === 404) return JSON.stringify({ error: 'User not found' });
 			if (!res.ok) return JSON.stringify({ error: `GitHub API error: ${res.status}` });
 			const data = await res.json();
@@ -135,9 +150,9 @@ export async function executeToolCall(name: string, args: Record<string, string>
 			const res = await fetch(
 				`https://api.github.com/users/${encodeURIComponent(args.username)}/repos?sort=stars&per_page=10&type=owner`,
 				{
-					headers: { 'User-Agent': USER_AGENT, Accept: 'application/vnd.github+json' },
+					headers,
 					signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-				},
+				}
 			);
 			if (!res.ok) return JSON.stringify({ error: `GitHub API error: ${res.status}` });
 			const repos = await res.json();
@@ -149,10 +164,37 @@ export async function executeToolCall(name: string, args: Record<string, string>
 					stargazers_count: r.stargazers_count,
 					forks_count: r.forks_count,
 					topics: r.topics,
-				})),
+				}))
 			);
 		}
 		default:
 			return JSON.stringify({ error: `Unknown tool: ${name}` });
+	}
+}
+
+/** Persist the outcome of an investigation to its `github_investigations` row.
+ *  Keyed by the DB row id (stable, known before the workflow starts) rather than
+ *  the workflow run id, so the update never depends on the run id being written
+ *  back first. A write failure is logged but not thrown — the workflow's own
+ *  return value is still the source of truth for the immediate response. */
+export async function saveInvestigationResult(
+	investigationId: string,
+	patch: { status: 'completed'; profileData: unknown } | { status: 'failed'; errorMessage: string }
+) {
+	'use step';
+
+	const { error } = await supabase
+		.from('github_investigations')
+		.update({
+			status: patch.status,
+			completed_at: new Date().toISOString(),
+			...(patch.status === 'completed'
+				? { profile_data: patch.profileData }
+				: { error_message: patch.errorMessage }),
+		})
+		.eq('id', investigationId);
+
+	if (error) {
+		console.error('[agent] failed to save investigation result:', error);
 	}
 }

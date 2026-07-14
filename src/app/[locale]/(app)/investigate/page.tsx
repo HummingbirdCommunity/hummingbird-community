@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InvestigationForm } from '@/components/investigation/InvestigationForm';
+import { RecentInvestigations } from '@/components/investigation/RecentInvestigations';
 
 export default async function InvestigatePage({
 	params,
@@ -26,6 +27,8 @@ export default async function InvestigatePage({
 						<InvestigationForm />
 					</CardContent>
 				</Card>
+
+				<RecentInvestigations />
 			</div>
 		</div>
 	);
