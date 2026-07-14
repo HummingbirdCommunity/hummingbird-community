@@ -132,6 +132,13 @@ Key synthesis tasks:
 
 ## 3. Output: Developer Profile Schema
 
+> ⚠️ **As-built note (2026-07-14):** The schema below is the original, fuller
+> design target. The shipped output (through Phase 2 / HB-21) is a leaner,
+> evidence-backed `DeveloperSummary` — see
+> [technical doc §0.7](github-research-agent-technical.md#07-output-schema-as-built)
+> and `src/lib/agent/types.ts`. The dimensions below remain the direction of
+> travel for future phases.
+
 The agent produces a structured JSON document with the following dimensions.
 
 ### 3.1 Identity

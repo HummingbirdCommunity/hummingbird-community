@@ -1,6 +1,107 @@
 # GitHub Research Agent - Technical Design
 
-> Status: Draft v2 | Date: 2026-07-12 | Updated to reflect HB-15/16/17 changes
+> Status: Draft v2 (original design) | Date: 2026-07-12
+> **As-built through Phase 2 (HB-18/19/20/21)** | Updated: 2026-07-14
+>
+> ⚠️ The sections below (§3–§12) capture the **original design intent**. The
+> implementation diverged on several deliberate calls — see
+> **§0 Implementation Status** for what is actually built. Where a later section
+> conflicts with §0, §0 wins.
+
+---
+
+## 0. Implementation Status (As-Built)
+
+This section is the source of truth for the current system. The rest of the doc
+is retained for design history and rationale.
+
+### 0.1 What shipped
+
+| Ticket | Scope | Status |
+|--------|-------|--------|
+| HB-18 (Phase 0) | Agentic tool-calling investigation loop — end-to-end vertical slice | ✅ Done |
+| HB-19 | Multi-provider OpenAI-compatible LLM fallback chain | ✅ Done |
+| HB-20 (Phase 1) | Requester-token auth, DB persistence, history list | ✅ Done (PR #16) |
+| HB-21 (Phase 2) | Deep data collection + evidence-backed rich schema | ✅ Done (this change) |
+
+### 0.2 Architecture: agentic loop, not a fixed pipeline
+
+The original design (§3) described a fixed 5-step pipeline
+(`collect-profile → analyze-repos → analyze-contributions → analyze-cross-repo → synthesize`).
+**As built, the agent is an LLM-driven tool-calling loop** ([`src/lib/agent/workflow.ts`](../../src/lib/agent/workflow.ts)):
+
+1. **Gathering** — the LLM decides which tools to call, in what order, until it
+   has enough evidence (bounded by `MAX_TURNS = 12`). Each LLM call and each tool
+   execution is a durable Vercel Workflow step.
+2. **Synthesis** — a separate LLM call with a JSON-schema `response_format`
+   produces the structured summary. Output is validated at runtime with zod, so a
+   provider that ignores the schema can't corrupt the result.
+
+This is the design doc's §13.5 "DurableAgent" direction, chosen over the rigid
+pipeline for flexibility.
+
+### 0.3 LLM: multi-provider fallback (not the Gemini SDK)
+
+Supersedes §4. There is no `@google/genai` dependency and no `gemini.ts`. Instead
+[`src/lib/agent/llm.ts`](../../src/lib/agent/llm.ts) exposes an ordered chain of
+**OpenAI-compatible** providers, configured via `LLM_PROVIDERS` (e.g.
+`gateway,gemini,openrouter`). On a `429/402/403` the workflow falls back to the
+next provider; synthesis additionally falls back on malformed/invalid JSON.
+`response_format: json_schema` downgrades to `json_object` automatically for
+providers that don't support it.
+
+### 0.4 Auth: requester's OAuth token (no dedicated agent PAT)
+
+Supersedes §5.1. **`GITHUB_AGENT_TOKEN` is intentionally NOT used.** Tool calls
+authenticate with the *requesting* user's connected GitHub OAuth token (HB-6),
+decrypted inside the workflow step ([`src/lib/github/token.ts`](../../src/lib/github/token.ts))
+so plaintext never enters durable state. Investigations run at 5,000 req/hr;
+when the requester hasn't connected GitHub we fall back to anonymous REST
+(60 req/hr) and GraphQL-backed tools return a graceful "connect GitHub" error.
+
+### 0.5 Tools (as built)
+
+Defined in [`src/lib/agent/steps/investigate.ts`](../../src/lib/agent/steps/investigate.ts):
+
+| Tool | Source | Notes |
+|------|--------|-------|
+| `get_github_profile` | REST `/users/{u}` | Identity, tenure, reach |
+| `get_top_repos` | REST `/users/{u}/repos?sort=stars` | Breadth signal |
+| `get_signature_repos` | GraphQL, reuses [`signature.ts`](../../src/lib/github/signature.ts) | Pinned + top-starred |
+| `get_contributions` | GraphQL, [`contributions.ts`](../../src/lib/agent/contributions.ts) | **Participation-weighted languages** (see §0.6) |
+| `search_cross_repo_prs` | REST Search API | External PRs (owner ≠ user) |
+
+### 0.6 Participation-weighted language proficiency
+
+The key skill-assessment signal. Raw byte stats (`/languages`) measure *codebase
+size*, not the user's own effort — one commit to a huge C repo would read as
+"97% C". Instead `get_contributions` ranks languages by the user's **own commit
+counts per repository** (`contributionsCollection.commitContributionsByRepository`),
+sampling up to 3 representative years to bound API spend. The pure helper
+`weightLanguagesByParticipation` is unit-testable in isolation. The synthesis
+prompt instructs the model to trust this over raw repo languages.
+
+### 0.7 Output schema (as built)
+
+Supersedes the `DeveloperProfile` schema in the requirements doc §3. The shipped
+shape is `DeveloperSummary` in [`src/lib/agent/types.ts`](../../src/lib/agent/types.ts)
+(zod-validated), with **evidence links** on every claim:
+`headline`, `career_stage`, `strengths[]`,
+`languages[{name, proficiency, evidence}]`,
+`domains[{name, depth, evidence}]`,
+`notable_repos[{name_with_owner, role, stars, url, reason}]`,
+`external_contributions[{repo, url, description}]`, `data_quality_notes[]`.
+
+### 0.8 Known gaps / follow-ups
+
+- **No automated tests yet** — `weightLanguagesByParticipation` is written as a
+  pure function for exactly this, but vitest isn't set up. Tracked as a follow-up.
+- **GraphQL tools require the requester to have connected GitHub** (by the §0.4
+  decision); anonymous investigations get REST-only depth.
+- Byte-based language distribution (existing [`languages.ts`](../../src/lib/github/languages.ts))
+  is not yet wired in as a complementary breadth signal.
+
+---
 
 ## 1. Architecture Overview
 
