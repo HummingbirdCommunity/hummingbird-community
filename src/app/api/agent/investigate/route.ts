@@ -20,17 +20,17 @@ export async function POST(request: Request) {
 		return Response.json({ error: 'Username required' }, { status: 400 });
 	}
 
-	// Create the durable tracking row up front so the workflow has somewhere to
-	// write its result. Keyed by this id, not the run id, so the save never
+	// Create the audit-trail run row up front so the workflow has a durable home
+	// to report into. Keyed by this id, not the run id, so the save never
 	// depends on the run id being stamped back first.
 	const { data: row, error: insertError } = await supabase
-		.from('github_investigations')
-		.insert({ target_username: username, requested_by: user.id, status: 'running' })
+		.from('investigation_runs')
+		.insert({ target_login: username, requested_by: user.id, status: 'running' })
 		.select('id')
 		.single();
 
 	if (insertError || !row) {
-		console.error('[agent] failed to create investigation row:', insertError);
+		console.error('[agent] failed to create investigation run row:', insertError);
 		return Response.json({ error: 'Failed to start investigation' }, { status: 500 });
 	}
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
 	// Stamp the run id so the result/stream routes can find this row by it.
 	const { error: updateError } = await supabase
-		.from('github_investigations')
+		.from('investigation_runs')
 		.update({ workflow_run_id: run.runId })
 		.eq('id', row.id);
 	if (updateError) {

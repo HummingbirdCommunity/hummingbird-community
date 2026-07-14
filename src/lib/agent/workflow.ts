@@ -16,12 +16,17 @@ import {
 	callProviderStructured,
 	emitProgress,
 	executeToolCall,
-	saveInvestigationResult,
+	saveRunResult,
 	SYSTEM_PROMPT,
+	upsertDeveloperProfile,
 } from './steps/investigate';
 import { developerSummarySchema } from './types';
 
 const MAX_TURNS = 12;
+
+// Observed profiles are cache-fresh for 7 days; the same mark drives the
+// non-member hard-delete purge (HB-28). See milestone-3 design §7.
+const OBSERVED_FRESH_DAYS = 7;
 
 // Tool name → progress i18n key (resolved by the frontend).
 const TOOL_PROGRESS_KEYS: Record<string, string> = {
@@ -99,7 +104,7 @@ async function runSynthesis(
 	throw new Error(`Synthesis failed across all providers. Last error: ${lastError}`);
 }
 
-export async function investigateGitHubUser(username: string, requesterId: string, investigationId: string) {
+export async function investigateGitHubUser(username: string, requesterId: string, runRowId: string) {
 	'use workflow';
 
 	try {
@@ -155,30 +160,37 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 		messages.push({ role: 'user', content: SYNTHESIS_PROMPT });
 		const summary = await runSynthesis(providers, messages);
 
-		const investigationResult = {
-			ok: true,
-			username,
-			profile: profileData
-				? {
-						name: profileData.name as string | null,
-						bio: profileData.bio as string | null,
-						location: profileData.location as string | null,
-						followers: profileData.followers as number,
-						publicRepos: profileData.public_repos as number,
-						avatarUrl: profileData.avatar_url as string,
-						url: profileData.html_url as string,
-					}
-				: null,
+		const identity = profileData
+			? {
+					name: profileData.name as string | null,
+					bio: profileData.bio as string | null,
+					location: profileData.location as string | null,
+					followers: profileData.followers as number,
+					publicRepos: profileData.public_repos as number,
+					avatarUrl: profileData.avatar_url as string,
+					url: profileData.html_url as string,
+				}
+			: null;
+
+		// Every run in this milestone is scenario 2 (analyzing others with the
+		// requester's token) → an observed profile of a non-member subject.
+		// authored profiles (subject-owned) arrive in HB-29.
+		const profileId = await upsertDeveloperProfile({
+			githubLogin: username.toLowerCase(),
+			source: 'observed',
+			subjectUserId: null,
 			summary,
-			toolCalls: toolCallLog,
-		};
+			provenance: { profile: identity, tool_calls: toolCallLog },
+			freshnessDays: OBSERVED_FRESH_DAYS,
+			setPurge: true,
+		});
 
-		await saveInvestigationResult(investigationId, { status: 'completed', profileData: investigationResult });
+		await saveRunResult(runRowId, { status: 'completed', profileId });
 
-		return investigationResult;
+		return { ok: true, username, profile: identity, summary, toolCalls: toolCallLog };
 	} catch (err) {
 		const message = err instanceof Error ? err.message : String(err);
-		await saveInvestigationResult(investigationId, { status: 'failed', errorMessage: message });
+		await saveRunResult(runRowId, { status: 'failed', errorMessage: message });
 		throw err;
 	}
 }
