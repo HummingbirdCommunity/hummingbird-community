@@ -8,8 +8,7 @@
 
 import { getRun } from 'workflow/api';
 
-import type { Provenance } from '@/lib/agent/types';
-
+import { buildInvestigationResult } from '@/lib/agent/profiles';
 import { getUserFromRequest } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
 
@@ -49,15 +48,7 @@ export async function GET(request: Request) {
 		if (profileError || !profile) {
 			return Response.json({ error: 'Failed to load investigation' }, { status: 500 });
 		}
-		const provenance = profile.provenance as Provenance | null;
-		return Response.json({
-			ok: true,
-			username: run.target_login,
-			profile: provenance?.profile ?? null,
-			summary: profile.summary,
-			evidenceSnapshot: profile.evidence_snapshot ?? null,
-			toolCalls: provenance?.tool_calls ?? [],
-		});
+		return Response.json(buildInvestigationResult(profile, run.target_login));
 	}
 	if (run.status === 'failed') {
 		return Response.json({ ok: false, error: run.error_message ?? 'Investigation failed' });
@@ -69,6 +60,9 @@ export async function GET(request: Request) {
 		const result = await getRun(runId).returnValue;
 		return Response.json(result);
 	} catch (err) {
-		return Response.json({ error: err instanceof Error ? err.message : 'Failed to get result' }, { status: 500 });
+		// The workflow rejected (e.g. every provider exhausted). Surface it as a
+		// failed result the client can render, not a 500 that leaves the UI
+		// spinning forever.
+		return Response.json({ ok: false, error: err instanceof Error ? err.message : 'Investigation failed' });
 	}
 }

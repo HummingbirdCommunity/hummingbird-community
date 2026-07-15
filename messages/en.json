@@ -157,6 +157,7 @@
 		"empty": "No investigations yet. Try one above.",
 		"errorGeneric": "Couldn't start investigation. Please try again.",
 		"errorNotFound": "GitHub user not found.",
+		"cached": "Served from cache",
 		"progress": {
 			"title": "Investigation in progress",
 			"complete": "Investigation complete!",
