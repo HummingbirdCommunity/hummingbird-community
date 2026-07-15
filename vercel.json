@@ -3,5 +3,11 @@
 		"deploymentEnabled": {
 			"staging-dev": false
 		}
-	}
+	},
+	"crons": [
+		{
+			"path": "/api/cron/purge-profiles",
+			"schedule": "0 3 * * *"
+		}
+	]
 }
