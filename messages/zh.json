@@ -157,6 +157,7 @@
 		"empty": "还没有调研记录，试试上面的输入框。",
 		"errorGeneric": "启动调研失败，请重试。",
 		"errorNotFound": "未找到该 GitHub 用户。",
+		"cached": "来自缓存",
 		"progress": {
 			"title": "调研进行中",
 			"complete": "调研完成！",
