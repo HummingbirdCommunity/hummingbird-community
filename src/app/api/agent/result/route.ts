@@ -8,8 +8,7 @@
 
 import { getRun } from 'workflow/api';
 
-import type { Provenance } from '@/lib/agent/types';
-
+import { buildInvestigationResult } from '@/lib/agent/profiles';
 import { getUserFromRequest } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
 
@@ -49,15 +48,7 @@ export async function GET(request: Request) {
 		if (profileError || !profile) {
 			return Response.json({ error: 'Failed to load investigation' }, { status: 500 });
 		}
-		const provenance = profile.provenance as Provenance | null;
-		return Response.json({
-			ok: true,
-			username: run.target_login,
-			profile: provenance?.profile ?? null,
-			summary: profile.summary,
-			evidenceSnapshot: profile.evidence_snapshot ?? null,
-			toolCalls: provenance?.tool_calls ?? [],
-		});
+		return Response.json(buildInvestigationResult(profile, run.target_login));
 	}
 	if (run.status === 'failed') {
 		return Response.json({ ok: false, error: run.error_message ?? 'Investigation failed' });

@@ -2,6 +2,7 @@
 
 import { start } from 'workflow/api';
 
+import { buildInvestigationResult, findReusableProfile } from '@/lib/agent/profiles';
 import { investigateGitHubUser } from '@/lib/agent/workflow';
 import { getUserFromRequest } from '@/lib/github/session';
 import { supabase } from '@/lib/supabase/server';
@@ -20,7 +21,23 @@ export async function POST(request: Request) {
 		return Response.json({ error: 'Username required' }, { status: 400 });
 	}
 
-	// Create the audit-trail run row up front so the workflow has a durable home
+	// Reuse decision tree (HB-28 §7): serve an existing profile without a new run
+	// when one qualifies. A cache hit is returned inline and is not recorded as a
+	// run — investigation_runs tracks generations, not reuse.
+	const reusable = await findReusableProfile(username.toLowerCase());
+	if (reusable) {
+		return Response.json({
+			status: 'cached',
+			result: {
+				...buildInvestigationResult(reusable, username),
+				cached: true,
+				source: reusable.source,
+				generatedAt: reusable.generated_at,
+			},
+		});
+	}
+
+	// Cache miss: regenerate. Create the audit-trail run row up front so the workflow has a durable home
 	// to report into. Keyed by this id, not the run id, so the save never
 	// depends on the run id being stamped back first.
 	const { data: row, error: insertError } = await supabase
