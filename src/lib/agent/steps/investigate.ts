@@ -9,6 +9,7 @@ import { aggregateSignatureRepos } from '@/lib/github/signature';
 import { getUserGitHubToken } from '@/lib/github/token';
 import { supabase } from '@/lib/supabase/server';
 
+import type { EvidenceSnapshot } from '../evidence';
 import type { DeveloperSummary, InvestigationProgress, ProfileSource, ProfileVisibility, Provenance } from '../types';
 import { fetchContributions } from '../contributions';
 import { llmChatWithProvider } from '../llm';
@@ -257,6 +258,7 @@ export async function upsertDeveloperProfile(input: {
 	visibility?: ProfileVisibility;
 	subjectUserId?: string | null;
 	summary: DeveloperSummary;
+	evidenceSnapshot: EvidenceSnapshot;
 	provenance: Provenance;
 	freshnessDays: number | null;
 	setPurge: boolean;
@@ -278,6 +280,7 @@ export async function upsertDeveloperProfile(input: {
 				visibility: input.visibility ?? 'private',
 				subject_user_id: input.subjectUserId ?? null,
 				summary: input.summary,
+				evidence_snapshot: input.evidenceSnapshot,
 				provenance: input.provenance,
 				generated_at: now.toISOString(),
 				fresh_until: expiresAt,

@@ -178,7 +178,12 @@
 			"domains": "Domains",
 			"notableRepos": "Notable repositories",
 			"externalContributions": "External contributions",
-			"dataQuality": "Data quality"
+			"dataQuality": "Data quality",
+			"evParticipation": "{commits} commits · {pct}%",
+			"evCommits": "{count} commits",
+			"evUserCommits": "Commits by this user",
+			"evStars": "Stars",
+			"evidenceEmpty": "No structured evidence for this claim."
 		}
 	},
 	"impersonation": {

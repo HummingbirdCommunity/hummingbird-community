@@ -7,8 +7,10 @@
 
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
+import type { CapturedToolOutputs } from './evidence';
 import type { ProviderInfo } from './llm';
 import type { DeveloperSummary } from './types';
+import { buildEvidenceSnapshot } from './evidence';
 import { getProviders } from './llm';
 import { SYNTHESIS_PROMPT } from './prompts';
 import {
@@ -27,6 +29,16 @@ const MAX_TURNS = 12;
 // Observed profiles are cache-fresh for 7 days; the same mark drives the
 // non-member hard-delete purge (HB-28). See milestone-3 design §7.
 const OBSERVED_FRESH_DAYS = 7;
+
+// Tool name → the evidence-snapshot slot its parsed output feeds (HB-27). Tools
+// not listed here (e.g. get_top_repos) don't back a synthesized conclusion, so
+// they aren't captured.
+const TOOL_EVIDENCE_KEYS: Partial<Record<string, keyof CapturedToolOutputs>> = {
+	get_github_profile: 'profile',
+	get_contributions: 'contributions',
+	get_signature_repos: 'signatureRepos',
+	search_cross_repo_prs: 'externalPrs',
+};
 
 // Tool name → progress i18n key (resolved by the frontend).
 const TOOL_PROGRESS_KEYS: Record<string, string> = {
@@ -116,7 +128,9 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 		];
 
 		const toolCallLog: Array<{ tool: string; args: Record<string, string> }> = [];
-		let profileData: Record<string, unknown> | null = null;
+		// Parsed tool outputs synthesis will consume, captured last-wins per tool
+		// so the evidence snapshot mirrors the synthesis input exactly (HB-27).
+		const captured: CapturedToolOutputs = {};
 		let doneGathering = false;
 
 		for (let turn = 0; turn < MAX_TURNS && !doneGathering; turn++) {
@@ -136,12 +150,12 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 
 					const result = await executeToolCall(name, args, requesterId);
 
-					if (name === 'get_github_profile') {
+					const evidenceKey = TOOL_EVIDENCE_KEYS[name];
+					if (evidenceKey) {
 						try {
-							const parsed = JSON.parse(result);
-							if (!parsed.error) profileData = parsed;
+							captured[evidenceKey] = JSON.parse(result);
 						} catch {
-							/* ignore */
+							/* leave uncaptured; the assembler treats it as absent */
 						}
 					}
 
@@ -156,21 +170,15 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 			throw new Error('Agent exceeded maximum turns without finishing evidence gathering');
 		}
 
+		// Assemble the evidence snapshot from exactly what was gathered, before
+		// synthesis runs — it is the auditable record of synthesis's input (HB-27).
+		const evidenceSnapshot = buildEvidenceSnapshot(captured);
+
 		// Synthesis: force a schema-valid summary from the gathered evidence.
 		messages.push({ role: 'user', content: SYNTHESIS_PROMPT });
 		const summary = await runSynthesis(providers, messages);
 
-		const identity = profileData
-			? {
-					name: profileData.name as string | null,
-					bio: profileData.bio as string | null,
-					location: profileData.location as string | null,
-					followers: profileData.followers as number,
-					publicRepos: profileData.public_repos as number,
-					avatarUrl: profileData.avatar_url as string,
-					url: profileData.html_url as string,
-				}
-			: null;
+		const identity = evidenceSnapshot.identity;
 
 		// Every run in this milestone is scenario 2 (analyzing others with the
 		// requester's token) → an observed profile of a non-member subject.
@@ -180,6 +188,7 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 			source: 'observed',
 			subjectUserId: null,
 			summary,
+			evidenceSnapshot,
 			provenance: { profile: identity, tool_calls: toolCallLog },
 			freshnessDays: OBSERVED_FRESH_DAYS,
 			setPurge: true,
@@ -187,7 +196,7 @@ export async function investigateGitHubUser(username: string, requesterId: strin
 
 		await saveRunResult(runRowId, { status: 'completed', profileId });
 
-		return { ok: true, username, profile: identity, summary, toolCalls: toolCallLog };
+		return { ok: true, username, profile: identity, summary, evidenceSnapshot, toolCalls: toolCallLog };
 	} catch (err) {
 		const message = err instanceof Error ? err.message : String(err);
 		await saveRunResult(runRowId, { status: 'failed', errorMessage: message });

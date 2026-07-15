@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 
+import type { EvidenceSnapshot } from './evidence';
+
 /** Progress update emitted to the streaming client during an investigation.
  *  `key` is an i18n message key; `params` are interpolation values.
  *  The frontend resolves them via next-intl. */
@@ -94,7 +96,7 @@ export interface DeveloperProfileRow {
 	source: ProfileSource;
 	visibility: ProfileVisibility;
 	summary: DeveloperSummary | null;
-	evidence_snapshot: unknown;
+	evidence_snapshot: EvidenceSnapshot | null;
 	provenance: Provenance | null;
 	generated_at: string | null;
 	fresh_until: string | null;
