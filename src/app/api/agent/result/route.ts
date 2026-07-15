@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 	if (run.status === 'completed' && run.profile_id) {
 		const { data: profile, error: profileError } = await supabase
 			.from('developer_profiles')
-			.select('summary, provenance')
+			.select('summary, evidence_snapshot, provenance')
 			.eq('id', run.profile_id)
 			.maybeSingle();
 		if (profileError || !profile) {
@@ -55,6 +55,7 @@ export async function GET(request: Request) {
 			username: run.target_login,
 			profile: provenance?.profile ?? null,
 			summary: profile.summary,
+			evidenceSnapshot: profile.evidence_snapshot ?? null,
 			toolCalls: provenance?.tool_calls ?? [],
 		});
 	}
