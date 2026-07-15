@@ -60,6 +60,9 @@ export async function GET(request: Request) {
 		const result = await getRun(runId).returnValue;
 		return Response.json(result);
 	} catch (err) {
-		return Response.json({ error: err instanceof Error ? err.message : 'Failed to get result' }, { status: 500 });
+		// The workflow rejected (e.g. every provider exhausted). Surface it as a
+		// failed result the client can render, not a 500 that leaves the UI
+		// spinning forever.
+		return Response.json({ ok: false, error: err instanceof Error ? err.message : 'Investigation failed' });
 	}
 }

@@ -97,18 +97,22 @@ export function InvestigationProgress({ runId }: Props): ReactElement {
 				});
 				if (res.ok) {
 					setResult(await res.json());
+				} else {
+					// A failed result fetch must surface as an error, not an
+					// endless spinner.
+					setError(t('failed'));
 				}
 			} catch {
-				// non-critical
+				setError(t('failed'));
 			}
 		}
 
 		fetchResult();
-	}, [streamDone, runId, error]);
+	}, [streamDone, runId, error, t]);
 
-	// A step is "done" only when there's a subsequent step OR the result has loaded.
-	// This way the last step keeps spinning until the workflow result is confirmed.
-	const allDone = result !== null;
+	// A step is "done" once the result loads or an error ends the run; otherwise
+	// the last step keeps spinning while work is still in flight.
+	const allDone = result !== null || error !== null;
 
 	return (
 		<div className="space-y-6">
