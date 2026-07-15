@@ -17,21 +17,29 @@ interface Props {
 	rows: EvidenceRow[];
 	/** Shown when no slice matched — a signal the claim has no structured backing. */
 	empty: string;
+	/** When the children already contain an interactive element (a link), leave
+	 *  this false: the card still reveals via group-focus-within, without adding a
+	 *  second tab stop or a redundant underline. */
+	focusable?: boolean;
 }
 
 /** A dependency-free hover-card: wraps a conclusion and reveals its evidence
  *  slice on hover or keyboard focus (HB-27, "省力档" audit). Positioned with
  *  Tailwind group utilities — no popover library. The trigger is focusable so
  *  the card is reachable without a pointer. */
-export function EvidenceHover({ children, title, rows, empty }: Props): ReactElement {
+export function EvidenceHover({ children, title, rows, empty, focusable = true }: Props): ReactElement {
 	return (
 		<span className="group relative inline-block">
-			<span
-				tabIndex={0}
-				className="decoration-muted-foreground/40 cursor-help underline decoration-dotted underline-offset-2 outline-none"
-			>
-				{children}
-			</span>
+			{focusable ? (
+				<span
+					tabIndex={0}
+					className="decoration-muted-foreground/40 cursor-help underline decoration-dotted underline-offset-2 outline-none"
+				>
+					{children}
+				</span>
+			) : (
+				children
+			)}
 			<span
 				role="tooltip"
 				className="bg-background invisible absolute top-full left-0 z-10 mt-1 w-max max-w-xs rounded-md border p-2 text-left opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"

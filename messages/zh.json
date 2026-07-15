@@ -178,7 +178,12 @@
 			"domains": "技术领域",
 			"notableRepos": "代表作品",
 			"externalContributions": "外部贡献",
-			"dataQuality": "数据质量说明"
+			"dataQuality": "数据质量说明",
+			"evParticipation": "{commits} 次提交 · {pct}%",
+			"evCommits": "{count} 次提交",
+			"evUserCommits": "本人提交数",
+			"evStars": "Stars",
+			"evidenceEmpty": "该结论暂无结构化依据。"
 		}
 	},
 	"impersonation": {
